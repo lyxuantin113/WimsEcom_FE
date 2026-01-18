@@ -39,7 +39,7 @@ axiosClient.interceptors.response.use(
             // Nếu server trả về 401 (Hết hạn login)
             if (error.response.status === 401) {
                 // Xóa token và đá về trang login
-                localStorage.removeItem('access_token');
+                localStorage.clear();
                 window.location.href = '/login';
             }
 

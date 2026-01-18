@@ -198,14 +198,11 @@ const AdminProductPage: React.FC = () => {
                 <Space size={"large"}>
                     {/* 1. Ô tìm kiếm */}
                     <Input.Search 
-                        placeholder="Tìm tên sản phẩm..."
+                        placeholder="Tên sản phẩm..." 
                         allowClear
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        onSearch={(value) => {
-                            setParams({ ...params, keyword: value, page: 1 })
-                        }} // Reset về trang 1 khi tìm
-                        style={{ width: 300, }}
+                        value={params.keyword}
+                        onChange={(e) => setParams({ ...params, keyword: e.target.value, page: 1 })}
+                        style={{ marginTop: 8 }}
                     />
 
                     {/* 2. Checkbox lọc hết hàng */}
@@ -252,7 +249,7 @@ const AdminProductPage: React.FC = () => {
                     current: params.page,
                     pageSize: params.size,
                     total: total,
-                    onChange: (p, s) => { setParams({ ...params, page: p, size: s }); fetchData(); }
+                    onChange: (p, s) => { setParams({ ...params, page: p, size: s }); }
                 }}
             />
 

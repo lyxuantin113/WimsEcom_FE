@@ -16,6 +16,16 @@ const productApi = {
         return axiosClient.get(url);
     },
 
+    getSearchHistory(): Promise<ApiResponse<string[]>> {
+        return axiosClient.get('/products/search-history');
+    },
+
+    deleteSearchHistory(keyword: string): Promise<ApiResponse<void>> {
+        return axiosClient.delete('/products/search-history', {
+            params: { keyword }
+        });
+    },
+
     // Hàm tạo mới (Dùng FormData để gửi cả File + Text)
     create(data: FormData): Promise<ApiResponse<any>> {
         return axiosClient.post('/products', data, {

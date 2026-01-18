@@ -1,4 +1,4 @@
-import type { ApiResponse, Discount, CartItemRequest } from "../types/backend";
+import type { ApiResponse, Discount, CartItemRequest, DiscountCalculationResponse } from "../types/backend";
 import axiosClient from "./axiosClient";
 
 const discountApi = {
@@ -19,7 +19,7 @@ const discountApi = {
         return axiosClient.delete(`/discounts/${id}`);
     },
     // User: Tính toán giảm giá
-    calculate: (data: { code: string; items: CartItemRequest[] }): Promise<ApiResponse<number>> => {
+    calculate: (data: { code: string; items: CartItemRequest[] }): Promise<ApiResponse<DiscountCalculationResponse>> => {
         return axiosClient.post('/discounts/calculate', data);
     }
 };

@@ -57,19 +57,6 @@ const HomePage: React.FC = () => {
 
     return (
         <div style={{ padding: '0 20px' }}>
-            {/* Banner quảng cáo đơn giản */}
-            <div style={{ 
-                textAlign: 'center', 
-                marginBottom: 40, 
-                padding: '40px 0', 
-                background: 'linear-gradient(90deg, #1677ff 0%, #00b96b 100%)',
-                borderRadius: '8px',
-                color: 'white'
-            }}>
-                <Title level={2} style={{ color: 'white', margin: 0 }}>SIÊU SALE MÙA HÈ</Title>
-                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16 }}>Giảm giá lên đến 50% cho các sản phẩm công nghệ</Text>
-            </div>
-
             <Carousel autoplay>
                 {banners.map(banner => (
                     <div key={banner.id}>

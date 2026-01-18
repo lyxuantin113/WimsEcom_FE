@@ -12,6 +12,7 @@ import categoryApi from '../../api/categoryApi';
 import type { ProductResponse, CategoryResponse } from '../../types/backend';
 import { useCart } from '../../context/CartContext';
 import cartApi from '../../api/cartApi';
+import SearchHistoryInput from '../../components/SearchHistoryInput';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -90,15 +91,11 @@ const ClientProductPage: React.FC = () => {
                         {/* 1. Tìm kiếm từ khóa */}
                         <div style={{ marginBottom: 20 }}>
                             <Text strong>Từ khóa</Text>
-                            <Input.Search 
-                                placeholder="Tên sản phẩm..." 
-                                allowClear
-                                value={filter.keyword}
-                                onChange={(e) => setFilter({ ...filter, keyword: e.target.value, page: 1 })}
+                            <SearchHistoryInput
+                                initialValue={filter.keyword}
                                 onSearch={(val) => {
                                     setFilter({ ...filter, keyword: val, page: 1 });
                                 }}
-                                style={{ marginTop: 8 }}
                             />
                         </div>
                         <Divider />
@@ -172,9 +169,7 @@ const ClientProductPage: React.FC = () => {
                                 onChange={(val) => setFilter({ ...filter, sortBy: val })}
                             >
                                 <Option value="createdAt">Mới nhất</Option>
-                                <Option value="price">Giá thấp đến cao</Option>
-                                {/* Cần xử lý logic sort desc/asc ở BE nếu muốn Giá cao -> thấp */}
-                                <Option value="sold">Bán chạy nhất</Option> 
+                                <Option value="price">Giá giảm dần</Option>
                             </Select>
                         </Space>
                     </div>

@@ -234,6 +234,12 @@ const OrderPage: React.FC = () => {
                                     <div style={{ background: '#fff1f0', padding: 10, border: '1px solid #ffa39e', borderRadius: 4 }}>
                                         <Text type="danger">Khách hàng yêu cầu trả hàng!</Text>
                                         <div style={{ marginTop: 10 }}>
+                                            <Button
+                                                onClick={() => handleUpdateStatus('CONFIRMED')} 
+                                                loading={updatingStatus}
+                                            >
+                                                Từ chối
+                                            </Button>
                                             <Button 
                                                 type="primary" 
                                                 danger 
