@@ -21,7 +21,7 @@ const AdminProductPage: React.FC = () => {
         categoryId: null,
     });
 
-    const [searchText, setSearchText] = useState('');
+    const [_searchText, setSearchText] = useState('');
 
     // --- STATE QUẢN LÝ MODAL (Create/Edit) ---
     const [isModalOpen, setIsModalOpen] = useState(false);

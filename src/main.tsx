@@ -4,9 +4,7 @@ import App from './App.tsx'
 import { CartProvider } from './context/CartContext';
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
     <CartProvider>
       <App />
     </CartProvider>
-  // </StrictMode>,
 )

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-    Row, Col, Card, Typography, 
-    Input, Slider, Button, 
+    Row, Col, Card, Typography, Slider, Button, 
     Pagination, Select, Spin, Empty, Space, Divider, 
     message
 } from 'antd';

@@ -274,8 +274,7 @@ const OrderHistoryPage: React.FC = () => {
                                 {
                                     title: 'Áp dụng giảm giá',
                                     dataIndex: 'isDiscounted',
-                                    render: (text, record) => {
-                                        console.log("Record Row:", record);
+                                    render: (_text, record) => {
                                         return record.isDiscounted ? 'Có' : 'Không'
                                     }
                                 }
