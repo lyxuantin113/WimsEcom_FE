@@ -9,8 +9,6 @@ import { Stomp } from '@stomp/stompjs';
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
 
-// Mock user ID (Thực tế bạn lấy từ JWT decode hoặc localStorage)
-// Ví dụ lưu lúc login: localStorage.setItem('userId', '1');
 const currentUserName = localStorage.getItem('username'); 
 
 const PublicLayout: React.FC = () => {
@@ -27,7 +25,8 @@ const PublicLayout: React.FC = () => {
         if (!isLoggedIn || currentUserName === null) return;
 
         // 1. Kết nối đến Server
-        const socket = new SockJS('http://localhost:8080/ws');
+        const apiUrl = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+        const socket = new SockJS(`${apiUrl}/ws`);
         const stompClient = Stomp.over(socket);
 
         // Tắt log debug của stomp cho đỡ rác console

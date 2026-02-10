@@ -1,8 +1,10 @@
 import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 
 // 1. Tạo instance với cấu hình mặc định
+const baseURL = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+
 const axiosClient: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/api', // Đảm bảo đúng port Backend
+    baseURL: `${baseURL}/api`,
     headers: {
         'Content-Type': 'application/json',
     },
