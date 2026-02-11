@@ -69,8 +69,8 @@ const LoginPage: React.FC = () => {
         }}>
             <Card style={{ width: 450, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                 <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                    <Title level={3}>WIMS SYSTEM</Title>
-                    <Text type="secondary">Quản lý kho & Bán hàng thông minh</Text>
+                    <Title level={3}>WIMS Shop</Title>
+                    <Text type="secondary">Chào mừng bạn đến với Wims!</Text>
                 </div>
 
                 <Tabs 
@@ -79,7 +79,7 @@ const LoginPage: React.FC = () => {
                     centered
                     items={[
                         {
-                            label: 'ĐĂNG NHẬP',
+                            label: 'Đăng Nhập',
                             key: 'login',
                             children: (
                                 <Form name="login_form" onFinish={onLogin} size="large" layout="vertical">
@@ -106,7 +106,7 @@ const LoginPage: React.FC = () => {
                             ),
                         },
                         {
-                            label: 'ĐĂNG KÝ',
+                            label: 'Đăng Ký',
                             key: 'register',
                             children: (
                                 <Form name="register_form" onFinish={onRegister} size="large" layout="vertical">

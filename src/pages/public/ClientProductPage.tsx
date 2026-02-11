@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    Row, Col, Card, Typography, Slider, Button, 
-    Pagination, Select, Spin, Empty, Space, Divider, 
+import {
+    Row, Col, Card, Typography, Slider, Button,
+    Pagination, Select, Spin, Empty, Space, Divider,
     message
 } from 'antd';
 import { FilterOutlined, ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
@@ -39,7 +39,7 @@ const ClientProductPage: React.FC = () => {
     });
 
     // State riêng cho Slider giá (để mượt UI, thả chuột mới call API)
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 99999999]); 
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 99999999]);
 
     // --- FETCH DATA ---
 
@@ -86,7 +86,7 @@ const ClientProductPage: React.FC = () => {
                 {/* === SIDEBAR (BÊN TRÁI) === */}
                 <Col xs={24} sm={24} md={6} lg={6}>
                     <Card title={<><FilterOutlined /> Bộ lọc tìm kiếm</>} style={{ height: 'fit-content' }}>
-                        
+
                         {/* 1. Tìm kiếm từ khóa */}
                         <div style={{ marginBottom: 20 }}>
                             <Text strong>Từ khóa</Text>
@@ -103,7 +103,7 @@ const ClientProductPage: React.FC = () => {
                         <div style={{ marginBottom: 20 }}>
                             <Text strong>Danh mục</Text>
                             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                <Text 
+                                <Text
                                     style={{ cursor: 'pointer', color: filter.categoryId === null ? '#1677ff' : 'inherit', fontWeight: filter.categoryId === null ? 'bold' : 'normal' }}
                                     onClick={() => setFilter({ ...filter, categoryId: null, page: 1 })}
                                 >
@@ -162,8 +162,8 @@ const ClientProductPage: React.FC = () => {
                         <Text>Hiển thị <strong>{products.length}</strong> trên <strong>{total}</strong> sản phẩm</Text>
                         <Space>
                             <Text>Sắp xếp:</Text>
-                            <Select 
-                                value={filter.sortBy} 
+                            <Select
+                                value={filter.sortBy}
                                 style={{ width: 180 }}
                                 onChange={(val) => setFilter({ ...filter, sortBy: val })}
                             >
@@ -188,14 +188,14 @@ const ClientProductPage: React.FC = () => {
                                             styles={{ body: { flex: 1 } }}
                                             cover={
                                                 <div style={{ height: 200, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
-                                                    <img 
-                                                        alt={product.name} 
-                                                        src={product.image} 
+                                                    <img
+                                                        alt={product.name}
+                                                        src={product.image}
                                                         style={{ width: 'auto', height: '100%', objectFit: 'cover' }} // objectFit: contain giúp ảnh không bị méo
                                                         onError={(e) => {
                                                             // Nếu ảnh lỗi thì hiện ảnh mặc định
                                                             const target = e.currentTarget;
-                                                            
+
                                                             // 1. Ảnh dự phòng (Dùng service khác ổn định hơn)
                                                             const fallbackSrc = "https://placehold.co/300x200?text=No+Image";
 
@@ -215,44 +215,46 @@ const ClientProductPage: React.FC = () => {
                                             }
                                             actions={[
                                                 <div onClick={(e) => {
-                                                        e.stopPropagation(); // 🟢 Chặn chuyển trang
-                                                        e.currentTarget.blur();
-                                                        navigate(`/products/${product.id}`);
-                                                    }} key="view">
+                                                    e.stopPropagation(); // 🟢 Chặn chuyển trang
+                                                    e.currentTarget.blur();
+                                                    navigate(`/products/${product.id}`);
+                                                }} key="view">
                                                     <EyeOutlined /> Xem
                                                 </div>,
                                                 product.stockQuantity > 0
-                                                ? <div 
-                                                    key="cart"
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation(); // Chặn sự kiện
-                                                        
-                                                        // Check Login nhanh
-                                                        if (!localStorage.getItem('access_token')) {
-                                                            message.warning('Bạn chưa đăng nhập!');
-                                                            return;
-                                                        }
+                                                    ? <div
+                                                        key="cart"
+                                                        onClick={async (e) => {
+                                                            e.stopPropagation(); // Chặn sự kiện
+                                                            const token = localStorage.getItem('access_token');
 
-                                                        try {
-                                                            // Gọi API thêm 1 sản phẩm
-                                                            const res = await cartApi.addToCart(product.id, 1);
-                                                            if (res && res.code === 1000) {
-                                                                message.success('Đã thêm vào giỏ!');
-                                                                refreshCart();
+                                                            if (!token) {
+                                                                message.warning('Vui lòng đăng nhập để mua hàng!');
+                                                                navigate('/login');
+                                                                return;
                                                             }
-                                                        } catch (error) {
-                                                            message.error('Lỗi thêm giỏ hàng');
-                                                        }
-                                                    }} 
-                                                >
-                                                    <ShoppingCartOutlined /> Thêm
-                                                </div> 
-                                                : <div key="cart" onClick={(e) => {
+                                                            // Check Login nhanh
+
+                                                            try {
+                                                                // Gọi API thêm 1 sản phẩm
+                                                                const res = await cartApi.addToCart(product.id, 1);
+                                                                if (res && res.code === 1000) {
+                                                                    message.success('Đã thêm vào giỏ!');
+                                                                    refreshCart();
+                                                                }
+                                                            } catch (error) {
+                                                                message.error('Lỗi thêm giỏ hàng');
+                                                            }
+                                                        }}
+                                                    >
+                                                        <ShoppingCartOutlined /> Thêm
+                                                    </div>
+                                                    : <div key="cart" onClick={(e) => {
                                                         e.stopPropagation(); // 🟢 Chặn chuyển trang
                                                         // Không làm gì cả
                                                     }}>
-                                                    <ShoppingCartOutlined /> Hết hàng
-                                                </div>
+                                                        <ShoppingCartOutlined /> Hết hàng
+                                                    </div>
                                             ]}
                                         >
                                             <Meta
@@ -262,8 +264,8 @@ const ClientProductPage: React.FC = () => {
                                                         <Text type="secondary" delete style={{ marginRight: 8 }}>
                                                             {/* Giả vờ có giá gốc cao hơn 10% */}
                                                             {(product.price * 1.1).toLocaleString()} đ
-                                                        </Text> 
-                                                        <br/>
+                                                        </Text>
+                                                        <br />
                                                         <Text type="danger" strong style={{ fontSize: 16 }}>
                                                             {product.price.toLocaleString()} đ
                                                         </Text>

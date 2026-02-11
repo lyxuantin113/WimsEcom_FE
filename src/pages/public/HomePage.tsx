@@ -62,10 +62,10 @@ const HomePage: React.FC = () => {
                     <div key={banner.id}>
                         {/* Bấm vào ảnh thì nhảy sang link khuyến mãi */}
                         <a onClick={() => navigate(banner.linkUrl)}>
-                            <img 
-                                src={banner.imageUrl} 
-                                style={{ width: '100%', height: '400px', objectFit: 'cover' }} 
-                                alt="banner" 
+                            <img
+                                src={banner.imageUrl}
+                                style={{ width: '100%', height: '400px', objectFit: 'cover' }}
+                                alt="banner"
                             />
                         </a>
                     </div>
@@ -87,14 +87,14 @@ const HomePage: React.FC = () => {
                                 styles={{ body: { flex: 1 } }}
                                 cover={
                                     <div style={{ height: 200, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
-                                        <img 
-                                            alt={product.name} 
-                                            src={product.image} 
+                                        <img
+                                            alt={product.name}
+                                            src={product.image}
                                             style={{ width: 'auto', height: '100%', objectFit: 'cover' }} // objectFit: contain giúp ảnh không bị méo
                                             onError={(e) => {
                                                 // Nếu ảnh lỗi thì hiện ảnh mặc định
                                                 const target = e.currentTarget;
-                                                
+
                                                 // 1. Ảnh dự phòng (Dùng service khác ổn định hơn)
                                                 const fallbackSrc = "https://placehold.co/300x200?text=No+Image";
 
@@ -114,44 +114,45 @@ const HomePage: React.FC = () => {
                                 }
                                 actions={[
                                     <div onClick={(e) => {
-                                            e.stopPropagation(); // 🟢 Chặn chuyển trang
-                                            e.currentTarget.blur();
-                                            navigate(`/products/${product.id}`);
-                                        }} key="view">
+                                        e.stopPropagation(); // 🟢 Chặn chuyển trang
+                                        e.currentTarget.blur();
+                                        navigate(`/products/${product.id}`);
+                                    }} key="view">
                                         <EyeOutlined /> Xem
                                     </div>,
                                     product.stockQuantity > 0
-                                    ? <div 
-                                        key="cart"
-                                        onClick={async (e) => {
-                                            e.stopPropagation(); // Chặn sự kiện
-                                            
-                                            // Check Login nhanh
-                                            if (!localStorage.getItem('access_token')) {
-                                                message.warning('Bạn chưa đăng nhập!');
-                                                return;
-                                            }
+                                        ? <div
+                                            key="cart"
+                                            onClick={async (e) => {
+                                                e.stopPropagation(); // Chặn sự kiện
 
-                                            try {
-                                                // Gọi API thêm 1 sản phẩm
-                                                const res = await cartApi.addToCart(product.id, 1);
-                                                if (res && res.code === 1000) {
-                                                    message.success('Đã thêm vào giỏ!');
-                                                    refreshCart();
+                                                // Check Login nhanh
+                                                if (!localStorage.getItem('access_token')) {
+                                                    message.warning('Vui lòng đăng nhập để mua hàng!');
+                                                    navigate('/login');
+                                                    return;
                                                 }
-                                            } catch (error) {
-                                                message.error('Lỗi thêm giỏ hàng');
-                                            }
-                                        }} 
-                                    >
-                                        <ShoppingCartOutlined /> Thêm
-                                    </div> 
-                                    : <div key="cart" onClick={(e) => {
+
+                                                try {
+                                                    // Gọi API thêm 1 sản phẩm
+                                                    const res = await cartApi.addToCart(product.id, 1);
+                                                    if (res && res.code === 1000) {
+                                                        message.success('Đã thêm vào giỏ!');
+                                                        refreshCart();
+                                                    }
+                                                } catch (error) {
+                                                    message.error('Lỗi thêm giỏ hàng');
+                                                }
+                                            }}
+                                        >
+                                            <ShoppingCartOutlined /> Thêm
+                                        </div>
+                                        : <div key="cart" onClick={(e) => {
                                             e.stopPropagation(); // 🟢 Chặn chuyển trang
                                             // Không làm gì cả
                                         }}>
-                                        <ShoppingCartOutlined /> Hết hàng
-                                    </div>
+                                            <ShoppingCartOutlined /> Hết hàng
+                                        </div>
                                 ]}
                             >
                                 <Meta
@@ -161,8 +162,8 @@ const HomePage: React.FC = () => {
                                             <Text type="secondary" delete style={{ marginRight: 8 }}>
                                                 {/* Giả vờ có giá gốc cao hơn 10% */}
                                                 {(product.price * 1.1).toLocaleString()} đ
-                                            </Text> 
-                                            <br/>
+                                            </Text>
+                                            <br />
                                             <Text type="danger" strong style={{ fontSize: 16 }}>
                                                 {product.price.toLocaleString()} đ
                                             </Text>
