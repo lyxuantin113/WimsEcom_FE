@@ -10,3 +10,16 @@ export interface LoginResponse {
     username: string;
     role: string; // Backend trả về 1 role (String), nếu là List thì sửa thành string[]
 }
+
+export interface RegisterRequest {
+    username: string;
+    password: string;
+    email: string;
+    fullname: string;
+}
+
+export interface RegisterResponse {
+    username: string;
+    email: string;
+    fullname: string;
+}
