@@ -214,9 +214,9 @@ const OrderHistoryPage: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: '20px', maxWidth: 1200, margin: '0 auto' }}>
-            <Title level={2}>Lịch sử đơn hàng</Title>
-            <Card>
+        <div className="animate-fade-up" style={{ padding: '20px 20px 60px 20px', maxWidth: 1200, margin: '0 auto' }}>
+            <Title level={2} style={{ fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 32 }}>Lịch sử đơn hàng</Title>
+            <Card className="premium-card" bordered={false} styles={{ body: { padding: '24px' } }}>
                 <Tabs 
                     defaultActiveKey="ALL" 
                     items={tabItems} 
@@ -228,6 +228,8 @@ const OrderHistoryPage: React.FC = () => {
                     dataSource={filteredStatusOrders} 
                     rowKey="id" 
                     loading={loading}
+                    pagination={{ pageSize: 10, position: ['bottomCenter'] }}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
 

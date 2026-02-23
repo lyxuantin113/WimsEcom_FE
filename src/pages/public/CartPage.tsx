@@ -257,20 +257,25 @@ const CartPage: React.FC = () => {
 
     if (!cart || cart.items.length === 0) {
         return (
-            <div style={{ textAlign: 'center', padding: '80px 0' }}>
-                <ShoppingOutlined style={{ fontSize: 60, color: '#ccc', marginBottom: 20 }} />
-                <Title level={3}>Giỏ hàng trống</Title>
-                <Button type="primary" onClick={() => navigate('/products')}>Tiếp tục mua sắm</Button>
+            <div className="animate-fade-up" style={{ textAlign: 'center', padding: '120px 0', background: 'var(--color-bg-body)', borderRadius: 16 }}>
+                <div style={{ background: '#fff', width: 120, height: 120, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: 'var(--shadow-sm)' }}>
+                    <ShoppingOutlined style={{ fontSize: 60, color: 'var(--color-primary)' }} />
+                </div>
+                <Title level={3} style={{ fontWeight: 700, letterSpacing: '-0.5px' }}>Giỏ hàng của bạn đang trống</Title>
+                <Text type="secondary" style={{ display: 'block', marginBottom: 32, fontSize: 16 }}>Hãy quay lại khám phá thêm các sản phẩm tuyệt vời nhé!</Text>
+                <Button type="primary" size="large" onClick={() => navigate('/products')} style={{ padding: '0 40px', height: 50, borderRadius: 25, fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>
+                    Tiếp tục mua sắm
+                </Button>
             </div>
         );
     }
 
     return (
-        <div style={{ padding: '20px', maxWidth: 1200, margin: '0 auto' }}>
-            <Title level={2} style={{marginBottom: 30}}>Giỏ hàng</Title>
+        <div className="animate-fade-up" style={{ padding: '20px 0px 60px 0px', maxWidth: 1200, margin: '0 auto' }}>
+            <Title level={2} style={{ marginBottom: 40, fontWeight: 800, letterSpacing: '-0.5px' }}>Giỏ hàng của bạn</Title>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 30, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', gap: 30, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 40, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     {/* BẢNG DANH SÁCH */}
                     <div style={{ flex: 2, minWidth: 300 }}>
                         <Table 
@@ -284,11 +289,11 @@ const CartPage: React.FC = () => {
                     </div>
 
                     {/* TỔNG TIỀN & MÃ GIẢM GIÁ */}
-                    <div style={{ flex: 1, minWidth: 300 }}>
-                        <Card title="Cộng giỏ hàng" bordered={false} style={{boxShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 15 }}>
-                                <Text>Tạm tính:</Text>
-                                <Text strong>{cart.totalAmount?.toLocaleString()} đ</Text>
+                    <div style={{ flex: 1, minWidth: 350 }}>
+                        <Card className="premium-card" title={<span style={{fontSize: 20, fontWeight: 700}}>Cộng giỏ hàng</span>} bordered={false} styles={{ body: { padding: '24px' } }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+                                <Text style={{ fontSize: 16, color: 'var(--text-muted)' }}>Tạm tính:</Text>
+                                <Text strong style={{ fontSize: 16 }}>{cart.totalAmount?.toLocaleString()} đ</Text>
                             </div>
 
                             {/* --- INPUT MÃ GIẢM GIÁ --- */}
@@ -317,11 +322,11 @@ const CartPage: React.FC = () => {
                                 )}
                             </div>
                             
-                            <Divider style={{margin: '12px 0'}} />
+                            <Divider style={{margin: '20px 0'}} />
                             
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-                                <Title level={4} style={{margin: 0}}>Tổng cộng:</Title>
-                                <Title level={4} type="danger" style={{margin: 0}}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24, padding: '16px', background: 'var(--color-bg-body)', borderRadius: 8 }}>
+                                <Title level={4} style={{margin: 0, fontWeight: 700}}>Tổng cộng:</Title>
+                                <Title level={4} type="danger" style={{margin: 0, fontWeight: 800}}>
                                     {finalTotal.toLocaleString()} đ
                                 </Title>
                             </div>
@@ -330,9 +335,10 @@ const CartPage: React.FC = () => {
                                 type="primary" 
                                 size="large" 
                                 block 
+                                className="hover-lift"
                                 icon={<ArrowRightOutlined />}
                                 onClick={handleOpenModal}
-                                style={{height: 50, fontSize: 16}}
+                                style={{height: 56, fontSize: 16, fontWeight: 600, borderRadius: 28, boxShadow: 'var(--shadow-md)'}}
                             >
                                 TIẾN HÀNH THANH TOÁN
                             </Button>

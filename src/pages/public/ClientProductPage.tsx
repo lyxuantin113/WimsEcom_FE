@@ -15,7 +15,6 @@ import SearchHistoryInput from '../../components/SearchHistoryInput';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-const { Meta } = Card;
 
 const ClientProductPage: React.FC = () => {
     const navigate = useNavigate();
@@ -76,20 +75,27 @@ const ClientProductPage: React.FC = () => {
     };
 
     return (
-        <div style={{ maxWidth: 1200, margin: '20px auto', padding: '0 20px' }}>
-            {/* Banner hoặc Breadcrumb nếu muốn */}
-            <div style={{ marginBottom: 20 }}>
-                <Title level={2}>Tất cả sản phẩm</Title>
+        <div className="animate-fade-up" style={{ maxWidth: 1400, margin: '0 auto', padding: '20px 24px 80px' }}>
+            {/* Header đơn giản */}
+            <div style={{ marginBottom: 40, textAlign: 'center' }}>
+                <Title level={1} style={{ fontWeight: 800, fontSize: 40, letterSpacing: '-1px', marginBottom: 8 }}>
+                    Cửa Hàng
+                </Title>
+                <Text type="secondary" style={{ fontSize: 16 }}>Khám phá bộ sưu tập sản phẩm mới nhất của chúng tôi</Text>
             </div>
 
-            <Row gutter={24}>
+            <Row gutter={[32, 32]}>
                 {/* === SIDEBAR (BÊN TRÁI) === */}
-                <Col xs={24} sm={24} md={6} lg={6}>
-                    <Card title={<><FilterOutlined /> Bộ lọc tìm kiếm</>} style={{ height: 'fit-content' }}>
-
+                <Col xs={24} lg={6}>
+                    <Card 
+                        className="premium-card" 
+                        title={<span style={{ fontWeight: 700 }}><FilterOutlined style={{ marginRight: 8 }} /> Bộ lọc</span>}
+                        style={{ position: 'sticky', top: 100, borderRadius: 16 }}
+                        styles={{ body: { padding: '24px' } }}
+                    >
                         {/* 1. Tìm kiếm từ khóa */}
-                        <div style={{ marginBottom: 20 }}>
-                            <Text strong>Từ khóa</Text>
+                        <div style={{ marginBottom: 32 }}>
+                            <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>Tìm kiếm</Text>
                             <SearchHistoryInput
                                 initialValue={filter.keyword}
                                 onSearch={(val) => {
@@ -97,22 +103,41 @@ const ClientProductPage: React.FC = () => {
                                 }}
                             />
                         </div>
-                        <Divider />
+
+                        <Divider style={{ margin: '24px 0' }} />
 
                         {/* 2. Danh mục */}
-                        <div style={{ marginBottom: 20 }}>
-                            <Text strong>Danh mục</Text>
-                            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ marginBottom: 32 }}>
+                            <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>Danh mục</Text>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                 <Text
-                                    style={{ cursor: 'pointer', color: filter.categoryId === null ? '#1677ff' : 'inherit', fontWeight: filter.categoryId === null ? 'bold' : 'normal' }}
+                                    className="hover-lift"
+                                    style={{ 
+                                        cursor: 'pointer', 
+                                        padding: '8px 12px',
+                                        borderRadius: 8,
+                                        background: filter.categoryId === null ? 'var(--color-bg-body)' : 'transparent',
+                                        color: filter.categoryId === null ? 'var(--color-primary)' : 'var(--text-muted)', 
+                                        fontWeight: filter.categoryId === null ? 700 : 500,
+                                        transition: 'all 0.3s ease'
+                                    }}
                                     onClick={() => setFilter({ ...filter, categoryId: null, page: 1 })}
                                 >
-                                    Tất cả
+                                    Tất cả sản phẩm
                                 </Text>
                                 {categories.map(cat => (
                                     <Text
                                         key={cat.id}
-                                        style={{ cursor: 'pointer', color: filter.categoryId === cat.id ? '#1677ff' : 'inherit', fontWeight: filter.categoryId === cat.id ? 'bold' : 'normal' }}
+                                        className="hover-lift"
+                                        style={{ 
+                                            cursor: 'pointer', 
+                                            padding: '8px 12px',
+                                            borderRadius: 8,
+                                            background: filter.categoryId === cat.id ? 'var(--color-bg-body)' : 'transparent',
+                                            color: filter.categoryId === cat.id ? 'var(--color-primary)' : 'var(--text-muted)', 
+                                            fontWeight: filter.categoryId === cat.id ? 700 : 500,
+                                            transition: 'all 0.3s ease'
+                                        }}
                                         onClick={() => setFilter({ ...filter, categoryId: cat.id, page: 1 })}
                                     >
                                         {cat.name}
@@ -120,173 +145,196 @@ const ClientProductPage: React.FC = () => {
                                 ))}
                             </div>
                         </div>
-                        <Divider />
+
+                        <Divider style={{ margin: '24px 0' }} />
 
                         {/* 3. Khoảng giá */}
-                        <div style={{ marginBottom: 20 }}>
-                            <Text strong>Khoảng giá</Text>
+                        <div style={{ marginBottom: 32 }}>
+                            <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 15 }}>Khoảng giá</Text>
                             <Slider
                                 range
                                 min={0}
-                                max={99999999} // Max giá cứng hoặc lấy từ API
-                                step={100000}
+                                max={50000000} // Max giá thực tế hơn
+                                step={500000}
                                 value={priceRange}
                                 onChange={(val) => setPriceRange(val as [number, number])}
                                 onChangeComplete={(val) => setFilter({ ...filter, minPrice: val[0], maxPrice: val[1], page: 1 })}
-                                style={{ marginTop: 10 }}
+                                styles={{
+                                    track: { background: 'var(--color-primary)' },
+                                    handle: { borderColor: 'var(--color-primary)', background: '#fff' }
+                                }}
                             />
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginTop: 8, color: 'var(--text-muted)' }}>
                                 <span>{formatCurrency(priceRange[0])}</span>
                                 <span>{formatCurrency(priceRange[1])}</span>
                             </div>
                         </div>
 
-                        {/* Nút Reset */}
-                        <Button block onClick={() => {
-                            setFilter({
-                                page: 1, size: 12, sortBy: 'createdAt',
-                                keyword: '', categoryId: null,
-                                minPrice: undefined, maxPrice: undefined
-                            });
-                            setPriceRange([0, 99999999]);
-                        }}>
-                            Xóa bộ lọc
+                        <Button 
+                            block 
+                            danger
+                            type="text"
+                            onClick={() => {
+                                setFilter({
+                                    page: 1, size: 12, sortBy: 'createdAt',
+                                    keyword: '', categoryId: null,
+                                    minPrice: undefined, maxPrice: undefined
+                                });
+                                setPriceRange([0, 50000000]);
+                            }}
+                            style={{ fontWeight: 600, marginTop: 12 }}
+                        >
+                            Xóa tất cả bộ lọc
                         </Button>
                     </Card>
                 </Col>
 
                 {/* === DANH SÁCH SẢN PHẨM (BÊN PHẢI) === */}
-                <Col xs={24} sm={24} md={18} lg={18}>
+                <Col xs={24} lg={18}>
                     {/* Header sắp xếp */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, background: '#fff', padding: 10, borderRadius: 8 }}>
-                        <Text>Hiển thị <strong>{products.length}</strong> trên <strong>{total}</strong> sản phẩm</Text>
-                        <Space>
-                            <Text>Sắp xếp:</Text>
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        marginBottom: 32, 
+                        background: '#fff', 
+                        padding: '16px 24px', 
+                        borderRadius: 16,
+                        boxShadow: 'var(--shadow-sm)'
+                    }}>
+                        <Text style={{ fontSize: 15 }}>Tìm thấy <strong style={{color: 'var(--color-primary)'}}>{total}</strong> sản phẩm</Text>
+                        <Space size="large">
+                            <Text style={{ fontWeight: 500 }}>Sắp xếp theo:</Text>
                             <Select
                                 value={filter.sortBy}
-                                style={{ width: 180 }}
+                                style={{ width: 160 }}
+                                variant="borderless"
                                 onChange={(val) => setFilter({ ...filter, sortBy: val })}
+                                dropdownStyle={{ borderRadius: 8 }}
                             >
                                 <Option value="createdAt">Mới nhất</Option>
-                                <Option value="price">Giá giảm dần</Option>
+                                <Option value="price">Giá từ thấp đến cao</Option>
+                                <Option value="price,desc">Giá từ cao đến thấp</Option>
                             </Select>
                         </Space>
                     </div>
 
                     {/* Grid Sản phẩm */}
-                    <Spin spinning={loading}>
+                    <Spin spinning={loading} size="large">
                         {products.length === 0 ? (
-                            <Empty description="Không tìm thấy sản phẩm nào" />
+                            <div style={{ padding: '80px 0', textAlign: 'center' }}>
+                                <Empty description={<Text type="secondary" style={{fontSize: 16}}>Không tìm thấy sản phẩm nào phù hợp với bộ lọc</Text>} />
+                            </div>
                         ) : (
-                            <Row gutter={[16, 16]}>
-                                {products.map(product => (
-                                    <Col xs={12} sm={12} md={8} lg={6} key={product.id}>
+                            <Row gutter={[24, 32]}>
+                                {products.map((product, index) => {
+                                    const delayClass = `delay-${(index % 4 + 1) * 100}`;
+                                    return (
+                                    <Col xs={12} sm={12} md={8} lg={8} key={product.id}>
                                         <Card
+                                            className={`premium-card animate-fade-up ${delayClass}`}
                                             hoverable
                                             onClick={() => navigate(`/products/${product.id}`)}
                                             style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                            styles={{ body: { flex: 1 } }}
+                                            styles={{ body: { flex: 1, padding: '20px' } }}
                                             cover={
-                                                <div style={{ height: 200, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
+                                                <div className="card-img-zoom" style={{ height: 260, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-body)' }}>
                                                     <img
                                                         alt={product.name}
                                                         src={product.image}
-                                                        style={{ width: 'auto', height: '100%', objectFit: 'cover' }} // objectFit: contain giúp ảnh không bị méo
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                         onError={(e) => {
-                                                            // Nếu ảnh lỗi thì hiện ảnh mặc định
                                                             const target = e.currentTarget;
-
-                                                            // 1. Ảnh dự phòng (Dùng service khác ổn định hơn)
-                                                            const fallbackSrc = "https://placehold.co/300x200?text=No+Image";
-
-                                                            // 2. CHẶN VÒNG LẶP:
-                                                            // Nếu cái ảnh hiện tại đã là ảnh fallback rồi mà vẫn lỗi -> Thì thôi, không cứu nữa.
+                                                            const fallbackSrc = "https://placehold.co/400x400?text=No+Image";
                                                             if (target.src === fallbackSrc) {
-                                                                target.onerror = null; // Gỡ bỏ sự kiện lỗi để không lặp
-                                                                target.style.display = 'none'; // Hoặc ẩn luôn ảnh đi cho đỡ rác
+                                                                target.onerror = null;
+                                                                target.style.display = 'none';
                                                                 return;
                                                             }
-
-                                                            // 3. Nếu chưa phải ảnh fallback -> Thay thế
                                                             target.src = fallbackSrc;
                                                         }}
                                                     />
                                                 </div>
                                             }
-                                            actions={[
-                                                <div onClick={(e) => {
-                                                    e.stopPropagation(); // 🟢 Chặn chuyển trang
-                                                    e.currentTarget.blur();
-                                                    navigate(`/products/${product.id}`);
-                                                }} key="view">
-                                                    <EyeOutlined /> Xem
-                                                </div>,
-                                                product.stockQuantity > 0
-                                                    ? <div
-                                                        key="cart"
-                                                        onClick={async (e) => {
-                                                            e.stopPropagation(); // Chặn sự kiện
-                                                            const token = localStorage.getItem('access_token');
-
-                                                            if (!token) {
-                                                                message.warning('Vui lòng đăng nhập để mua hàng!');
-                                                                navigate('/login');
-                                                                return;
-                                                            }
-                                                            // Check Login nhanh
-
-                                                            try {
-                                                                // Gọi API thêm 1 sản phẩm
-                                                                const res = await cartApi.addToCart(product.id, 1);
-                                                                if (res && res.code === 1000) {
-                                                                    message.success('Đã thêm vào giỏ!');
-                                                                    refreshCart();
-                                                                }
-                                                            } catch (error) {
-                                                                message.error('Lỗi thêm giỏ hàng');
-                                                            }
-                                                        }}
-                                                    >
-                                                        <ShoppingCartOutlined /> Thêm
-                                                    </div>
-                                                    : <div key="cart" onClick={(e) => {
-                                                        e.stopPropagation(); // 🟢 Chặn chuyển trang
-                                                        // Không làm gì cả
-                                                    }}>
-                                                        <ShoppingCartOutlined /> Hết hàng
-                                                    </div>
-                                            ]}
                                         >
-                                            <Meta
-                                                title={<div style={{ whiteSpace: 'normal' }}>{product.name}</div>} // Cho phép tên xuống dòng
-                                                description={
-                                                    <div>
-                                                        <Text type="secondary" delete style={{ marginRight: 8 }}>
-                                                            {/* Giả vờ có giá gốc cao hơn 10% */}
-                                                            {(product.price * 1.1).toLocaleString()} đ
-                                                        </Text>
-                                                        <br />
-                                                        <Text type="danger" strong style={{ fontSize: 16 }}>
-                                                            {product.price.toLocaleString()} đ
-                                                        </Text>
-                                                    </div>
-                                                }
-                                            />
+                                            <div style={{ marginBottom: 16 }}>
+                                                <div style={{ 
+                                                    fontSize: 16, 
+                                                    fontWeight: 600, 
+                                                    lineHeight: 1.4, 
+                                                    marginBottom: 8, 
+                                                    display: '-webkit-box', 
+                                                    WebkitLineClamp: 2, 
+                                                    WebkitBoxOrient: 'vertical', 
+                                                    overflow: 'hidden',
+                                                    minHeight: '44px'
+                                                }}>
+                                                    {product.name}
+                                                </div>
+                                                <Text type="secondary" delete style={{ fontSize: 13 }}>
+                                                    {(product.price * 1.1).toLocaleString()} đ
+                                                </Text>
+                                                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-primary)', marginTop: 2 }}>
+                                                    {product.price.toLocaleString()} đ
+                                                </div>
+                                            </div>
+
+                                            <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
+                                                <Button 
+                                                    block
+                                                    icon={<EyeOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/products/${product.id}`);
+                                                    }}
+                                                    style={{ borderRadius: 8 }}
+                                                >
+                                                    Xem
+                                                </Button>
+                                                <Button 
+                                                    type="primary"
+                                                    block
+                                                    disabled={product.stockQuantity <= 0}
+                                                    icon={<ShoppingCartOutlined />}
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation();
+                                                        const token = localStorage.getItem('access_token');
+                                                        if (!token) {
+                                                            message.warning('Vui lòng đăng nhập để mua hàng!');
+                                                            navigate('/login');
+                                                            return;
+                                                        }
+                                                        try {
+                                                            const res = await cartApi.addToCart(product.id, 1);
+                                                            if (res && res.code === 1000) {
+                                                                message.success('Đã thêm vào giỏ!');
+                                                                refreshCart();
+                                                            }
+                                                        } catch (error) {
+                                                            message.error('Lỗi thêm giỏ hàng');
+                                                        }
+                                                    }}
+                                                    style={{ borderRadius: 8 }}
+                                                >
+                                                    {product.stockQuantity > 0 ? 'Thêm' : 'Hết'}
+                                                </Button>
+                                            </div>
                                         </Card>
                                     </Col>
-                                ))}
+                                )})}
                             </Row>
                         )}
                     </Spin>
 
                     {/* Phân trang */}
-                    <div style={{ marginTop: 30, textAlign: 'center' }}>
+                    <div style={{ marginTop: 60, textAlign: 'center' }}>
                         <Pagination
                             current={filter.page}
                             pageSize={filter.size}
                             total={total}
                             onChange={(page, pageSize) => setFilter({ ...filter, page, size: pageSize })}
                             showSizeChanger
+                            style={{ padding: '16px', borderRadius: 8, background: '#fff', boxShadow: 'var(--shadow-sm)', display: 'inline-flex' }}
                         />
                     </div>
                 </Col>

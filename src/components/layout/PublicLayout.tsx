@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Button, Badge, Space, Popover, List, Typography, Avatar } from 'antd';
+import { Layout, Menu, Button, Badge, Space, Popover, List, Typography, Avatar, Row, Col, Divider } from 'antd';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { ShoppingCartOutlined, UserOutlined, LoginOutlined, LogoutOutlined, BellOutlined } from '@ant-design/icons';
 import { useCart } from '../../context/CartContext'; 
@@ -7,7 +7,7 @@ import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 
 const { Header, Content, Footer } = Layout;
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const currentUserName = localStorage.getItem('username'); 
 
@@ -87,28 +87,32 @@ const PublicLayout: React.FC = () => {
     };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Header style={{ 
+        <Layout style={{ minHeight: '100vh', background: 'var(--color-bg-body)' }}>
+            <Header className="glass-effect" style={{ 
                 position: 'sticky', top: 0, zIndex: 1000, width: '100%', 
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                padding: '0 50px', height: 72, lineHeight: '72px'
             }}>
-                <div className="logo" style={{ fontSize: 20, fontWeight: 'bold', cursor: 'pointer', color: '#1677ff' }} onClick={() => navigate('/')}>
-                    MY STORE
+                <div className="logo hover-lift" style={{ 
+                    fontSize: 24, fontWeight: 800, cursor: 'pointer', 
+                    color: 'var(--color-primary)', letterSpacing: '-0.5px',
+                    display: 'flex', alignItems: 'center'
+                }} onClick={() => navigate('/')}>
+                    WIMS SHOP
                 </div>
 
                 <Menu 
                     mode="horizontal" 
                     selectedKeys={[location.pathname]}
-                    style={{ flex: 1, borderBottom: 'none', marginLeft: 40 }}
+                    style={{ flex: 1, borderBottom: 'none', marginLeft: 60, background: 'transparent', fontSize: 16, fontWeight: 500 }}
                     items={[
                         { key: '/', label: <Link to="/">Trang chủ</Link> },
                         { key: '/products', label: <Link to="/products">Sản phẩm</Link> },
-                        { key: '/my-orders', label: <Link to="/my-orders">Lịch sử đơn hàng</Link> }, // Sửa lại link cho đúng với router cũ
+                        { key: '/my-orders', label: <Link to="/my-orders">Lịch sử đơn hàng</Link> }, 
                     ]} 
                 />
 
-                <Space size="large">
+                <Space size="large" style={{ alignItems: 'center' }}>
                     {/* --- 🔔 CÁI CHUÔNG THÔNG BÁO --- */}
                     {isLoggedIn && (
                         <Popover 
@@ -120,45 +124,82 @@ const PublicLayout: React.FC = () => {
                                 if (visible) setUnreadCount(0); // Mở ra thì coi như đã đọc
                             }}
                         >
-                            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                            <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }}>
                                 <Badge count={unreadCount} size="small">
-                                    <BellOutlined style={{ fontSize: 24, color: '#333' }} />
+                                    <BellOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
                                 </Badge>
                             </div>
                         </Popover>
                     )}
 
                     {/* Giỏ hàng */}
-                    <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/cart')}>
+                    <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }} onClick={() => navigate('/cart')}>
                         <Badge count={totalItems} showZero size="small">
-                            <ShoppingCartOutlined style={{ fontSize: 24, color: '#333' }} />
+                            <ShoppingCartOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
                         </Badge>
                     </div>
 
                     {isLoggedIn ? (
-                        <>
-                            <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/admin')}>
+                        <Space size="middle" style={{ marginLeft: 16 }}>
+                            <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/admin')} style={{ fontWeight: 600 }}>
                                 {localStorage.getItem('username')}
                             </Button>
-                            <Button type="text" icon={<LogoutOutlined />} onClick={handleLogout}>
+                            <Button danger type="text" icon={<LogoutOutlined />} onClick={handleLogout} style={{ fontWeight: 500 }}>
                                 Đăng xuất
                             </Button>
-                        </>
+                        </Space>
                     ) : (
-                        <Button type="primary" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
+                        <Button type="primary" size="large" icon={<LoginOutlined />} onClick={() => navigate('/login')} style={{ marginLeft: 16, fontWeight: 600, padding: '0 24px' }}>
                             Đăng nhập
                         </Button>
                     )}
                 </Space>
             </Header>
 
-            <Content style={{ padding: '20px 50px', background: '#f5f5f5' }}>
-                <div style={{ background: '#fff', minHeight: 380, padding: 24, borderRadius: 8 }}>
+            <Content style={{ padding: '40px 50px', maxWidth: 1400, margin: '0 auto', width: '100%' }}>
+                <div className="premium-card animate-fade-up" style={{ background: '#fff', minHeight: 'calc(100vh - 250px)', padding: 32 }}>
                     <Outlet />
                 </div>
             </Content>
 
-            <Footer style={{ textAlign: 'center' }}>My Store ©2024 Created by You</Footer>
+            <Footer style={{ background: '#1e293b', padding: '80px 50px 40px', color: 'rgba(255,255,255,0.65)' }}>
+                <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+                    <Row gutter={[40, 40]}>
+                        <Col xs={24} md={8}>
+                            <div style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 20 }}>WIMS SHOP</div>
+                            <Text style={{ fontSize: 15, lineHeight: 1.6, color: 'rgba(255,255,255,0.65)' }}>
+                                Thiên đường mua sắm sành điệu dành cho giới trẻ. Chúng tôi cam kết mang đến những sản phẩm chất lượng nhất với giá thành hợp lý nhất.
+                            </Text>
+                        </Col>
+                        <Col xs={12} md={4}>
+                            <Title level={4} style={{ marginTop: 0, marginBottom: 24, color: '#fff' }}>Khám phá</Title>
+                            <Space direction="vertical" size="middle">
+                                <Link to="/" style={{ color: 'rgba(255,255,255,0.65)' }} className="hover-lift">Trang chủ</Link>
+                                <Link to="/products" style={{ color: 'rgba(255,255,255,0.65)' }} className="hover-lift">Sản phẩm</Link>
+                                <Link to="/cart" style={{ color: 'rgba(255,255,255,0.65)' }} className="hover-lift">Giỏ hàng</Link>
+                            </Space>
+                        </Col>
+                        <Col xs={12} md={4}>
+                            <Title level={4} style={{ marginTop: 0, marginBottom: 24, color: '#fff' }}>Hỗ trợ</Title>
+                            <Space direction="vertical" size="middle">
+                                <Text style={{ color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}>Hướng dẫn mua hàng</Text>
+                                <Text style={{ color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}>Chính sách đổi trả</Text>
+                                <Text style={{ color: 'rgba(255,255,255,0.65)', cursor: 'pointer' }}>Liên hệ</Text>
+                            </Space>
+                        </Col>
+                        <Col xs={24} md={8}>
+                            <Title level={4} style={{ marginTop: 0, marginBottom: 24, color: '#fff' }}>Liên hệ với chúng tôi</Title>
+                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM</Text>
+                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Email: support@wimsshop.com</Text>
+                            <Text style={{ display: 'block', color: 'rgba(255,255,255,0.65)' }}>Hotline: 1900 1234</Text>
+                        </Col>
+                    </Row>
+                    <Divider style={{ margin: '40px 0 24px', borderColor: 'rgba(255,255,255,0.1)' }} />
+                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: 14 }}>
+                        ©{new Date().getFullYear()} WIMS SHOP. All rights reserved. Built with ❤️ by Xuan Tin
+                    </div>
+                </div>
+            </Footer>
         </Layout>
     );
 };

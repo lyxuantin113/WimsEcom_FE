@@ -56,85 +56,91 @@ const HomePage: React.FC = () => {
     }, []);
 
     return (
-        <div style={{ padding: '0 20px' }}>
-            <Carousel autoplay>
-                {banners.map(banner => (
-                    <div key={banner.id}>
-                        {/* Bấm vào ảnh thì nhảy sang link khuyến mãi */}
-                        <a onClick={() => navigate(banner.linkUrl)}>
-                            <img
-                                src={banner.imageUrl}
-                                style={{ width: '100%', height: '400px', objectFit: 'cover' }}
-                                alt="banner"
-                            />
-                        </a>
-                    </div>
-                ))}
-            </Carousel>
+        <div style={{ marginBottom: 40, paddingBottom: 20 }}>
+            <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
+                <Carousel autoplay effect="fade">
+                    {banners.map(banner => (
+                        <div key={banner.id} style={{ position: 'relative' }}>
+                            <a onClick={() => navigate(banner.linkUrl)} style={{ display: 'block', position: 'relative' }}>
+                                {/* Gradient Overlay to make text pop if added later */}
+                                <div style={{
+                                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                    background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 40%)',
+                                    zIndex: 1, pointerEvents: 'none'
+                                }} />
+                                <img
+                                    src={banner.imageUrl}
+                                    style={{ width: '100%', height: '500px', objectFit: 'cover' }}
+                                    alt="banner"
+                                />
+                            </a>
+                        </div>
+                    ))}
+                </Carousel>
+            </div>
 
-            <Title level={3} style={{ marginBottom: 20, textAlign: 'center' }}>Sản phẩm mới nhất</Title>
+            <div style={{ textAlign: 'center', margin: '60px 0 40px', textTransform: 'capitalize' }} className="animate-fade-up">
+                <Title level={2} style={{ marginBottom: 8, fontWeight: 800, color: 'var(--text-dark)', letterSpacing: '-0.5px' }}>
+                    Sản phẩm mới nhất
+                </Title>
+                <Text type="secondary" style={{ fontSize: 16 }}>Khám phá những xu hướng tiên tiến nhất</Text>
+            </div>
 
             {loading ? (
-                <div style={{ textAlign: 'center', padding: 50 }}><Spin size="large" /></div>
+                <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>
             ) : (
-                <Row gutter={[16, 24]}> {/* Khoảng cách giữa các ô: Ngang 16px, Dọc 24px */}
-                    {products.map((product) => (
+                <Row gutter={[24, 32]}>
+                    {products.map((product, index) => {
+                        const delayClass = `delay-${(index % 4 + 1) * 100}`;
+                        
+                        return (
                         <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
                             <Card
+                                className={`premium-card animate-fade-up ${delayClass}`}
                                 hoverable
                                 onClick={() => navigate(`/products/${product.id}`)}
                                 style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                styles={{ body: { flex: 1 } }}
+                                styles={{ body: { flex: 1, padding: '24px' } }}
                                 cover={
-                                    <div style={{ height: 200, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
+                                    <div className="card-img-zoom" style={{ height: 260, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
                                         <img
                                             alt={product.name}
                                             src={product.image}
-                                            style={{ width: 'auto', height: '100%', objectFit: 'cover' }} // objectFit: contain giúp ảnh không bị méo
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             onError={(e) => {
-                                                // Nếu ảnh lỗi thì hiện ảnh mặc định
                                                 const target = e.currentTarget;
-
-                                                // 1. Ảnh dự phòng (Dùng service khác ổn định hơn)
-                                                const fallbackSrc = "https://placehold.co/300x200?text=No+Image";
-
-                                                // 2. CHẶN VÒNG LẶP:
-                                                // Nếu cái ảnh hiện tại đã là ảnh fallback rồi mà vẫn lỗi -> Thì thôi, không cứu nữa.
+                                                const fallbackSrc = "https://placehold.co/400x400?text=No+Image";
                                                 if (target.src === fallbackSrc) {
-                                                    target.onerror = null; // Gỡ bỏ sự kiện lỗi để không lặp
-                                                    target.style.display = 'none'; // Hoặc ẩn luôn ảnh đi cho đỡ rác
+                                                    target.onerror = null; 
+                                                    target.style.display = 'none'; 
                                                     return;
                                                 }
-
-                                                // 3. Nếu chưa phải ảnh fallback -> Thay thế
                                                 target.src = fallbackSrc;
                                             }}
                                         />
                                     </div>
                                 }
                                 actions={[
-                                    <div onClick={(e) => {
-                                        e.stopPropagation(); // 🟢 Chặn chuyển trang
+                                    <div className="hover-lift" onClick={(e) => {
+                                        e.stopPropagation(); 
                                         e.currentTarget.blur();
                                         navigate(`/products/${product.id}`);
-                                    }} key="view">
-                                        <EyeOutlined /> Xem
+                                    }} key="view" style={{ padding: '12px 0' }}>
+                                        <EyeOutlined style={{ marginRight: 6 }} /> Xem chi tiết
                                     </div>,
-                                    product.stockQuantity > 0
-                                        ? <div
+                                    product.stockQuantity > 0 ? (
+                                        <div
+                                            className="hover-lift"
                                             key="cart"
+                                            style={{ padding: '12px 0', color: 'var(--color-primary)', fontWeight: 600 }}
                                             onClick={async (e) => {
-                                                e.stopPropagation(); // Chặn sự kiện
-
-                                                // Check Login nhanh
+                                                e.stopPropagation(); 
                                                 if (!localStorage.getItem('access_token')) {
                                                     message.warning('Vui lòng đăng nhập để mua hàng!');
                                                     navigate('/login');
                                                     return;
                                                 }
-
                                                 try {
-                                                    // Gọi API thêm 1 sản phẩm
                                                     const res = await cartApi.addToCart(product.id, 1);
                                                     if (res && res.code === 1000) {
                                                         message.success('Đã thêm vào giỏ!');
@@ -145,26 +151,31 @@ const HomePage: React.FC = () => {
                                                 }
                                             }}
                                         >
-                                            <ShoppingCartOutlined /> Thêm
+                                            <ShoppingCartOutlined style={{ marginRight: 6, fontSize: 16 }} /> Bỏ vào giỏ
                                         </div>
-                                        : <div key="cart" onClick={(e) => {
-                                            e.stopPropagation(); // 🟢 Chặn chuyển trang
-                                            // Không làm gì cả
-                                        }}>
-                                            <ShoppingCartOutlined /> Hết hàng
+                                    ) : (
+                                        <div key="cart" onClick={(e) => e.stopPropagation()} style={{ padding: '12px 0', color: '#ff4d4f', cursor: 'not-allowed' }}>
+                                            <ShoppingCartOutlined style={{ marginRight: 6 }} /> Hết hàng
                                         </div>
+                                    )
                                 ]}
                             >
                                 <Meta
-                                    title={<div style={{ whiteSpace: 'normal' }}>{product.name}</div>} // Cho phép tên xuống dòng
+                                    title={
+                                        <div style={{ 
+                                            whiteSpace: 'normal', fontSize: 16, fontWeight: 700, 
+                                            lineHeight: 1.4, marginBottom: 12, display: '-webkit-box', 
+                                            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+                                        }}>
+                                            {product.name}
+                                        </div>
+                                    }
                                     description={
                                         <div>
-                                            <Text type="secondary" delete style={{ marginRight: 8 }}>
-                                                {/* Giả vờ có giá gốc cao hơn 10% */}
+                                            <Text type="secondary" delete style={{ marginRight: 8, fontSize: 14 }}>
                                                 {(product.price * 1.1).toLocaleString()} đ
                                             </Text>
-                                            <br />
-                                            <Text type="danger" strong style={{ fontSize: 16 }}>
+                                            <Text strong style={{ fontSize: 20, color: 'var(--color-primary)' }}>
                                                 {product.price.toLocaleString()} đ
                                             </Text>
                                         </div>
@@ -172,7 +183,7 @@ const HomePage: React.FC = () => {
                                 />
                             </Card>
                         </Col>
-                    ))}
+                    )})}
                 </Row>
             )}
         </div>
