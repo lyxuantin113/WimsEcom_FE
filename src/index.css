@@ -86,15 +86,19 @@ body {
 
 /* Base card styling override */
 .premium-card {
-  border: none !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.03) !important;
+  border-radius: 16px !important;
+  /* Bo góc mượt hơn */
+  box-shadow: var(--shadow-md) !important;
   transition: var(--transition-smooth);
   overflow: hidden;
+  background: #fff !important;
 }
 
 .premium-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(133, 61, 44, 0.1) !important;
+  /* Màu primary mờ */
 }
 
 /* Image zoom effect inside card */

@@ -37,7 +37,7 @@ const CategoryProductSection: React.FC<CategoryProductSectionProps> = ({ categor
     if (!loading && products.length === 0) return null;
 
     return (
-        <div style={{ marginBottom: 80 }} className="animate-fade-up">
+        <div style={{ marginBottom: 32 }} className="animate-fade-up">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32 }}>
                 <div>
                     <Title level={2} style={{ marginBottom: 8, fontWeight: 800, color: 'var(--text-dark)', letterSpacing: '-0.5px', textTransform: 'uppercase' }}>
@@ -72,7 +72,7 @@ const CategoryProductSection: React.FC<CategoryProductSectionProps> = ({ categor
                         ]}
                     >
                         {products.map((product) => (
-                            <div key={product.id} style={{ padding: '10px' }}>
+                            <div key={product.id} style={{ padding: '0 12px 24px 12px' }}>
                                 <ProductCard product={product} />
                             </div>
                         ))}
