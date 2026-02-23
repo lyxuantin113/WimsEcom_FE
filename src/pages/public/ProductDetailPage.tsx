@@ -7,9 +7,9 @@ import productApi from '../../api/productApi';
 import type { ProductResponse } from '../../types/backend';
 import cartApi from '../../api/cartApi';
 import { useCart } from '../../context/CartContext';
+import ProductCard from '../../components/product/ProductCard';
 
 const { Title, Text, Paragraph } = Typography;
-const { Meta } = Card; // Import Meta cho Card
 
 const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -105,12 +105,12 @@ const ProductDetailPage: React.FC = () => {
 
     return (
         <div className="animate-fade-up" style={{ padding: '20px 20px 80px 20px', maxWidth: 1200, margin: '0 auto' }}>
-            <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 24, fontSize: 16, fontWeight: 500, color: 'var(--text-muted)' }}>
+            <Button type="text" icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 8, fontSize: 16, fontWeight: 500, color: 'var(--text-muted)' }}>
                 Quay lại
             </Button>
 
             {/* --- PHẦN CHI TIẾT SẢN PHẨM --- */}
-            <Card className="premium-card" style={{ marginBottom: 60 }} styles={{ body: { padding: '40px' } }}>
+            <Card className="premium-card" style={{ marginBottom: 60, borderRadius: 16, overflow: 'hidden' }} styles={{ body: { padding: '32px' } }}>
                 <Row gutter={[50, 40]}>
                     <Col xs={24} md={11}>
                         <div className="card-img-zoom" style={{ borderRadius: 16, overflow: 'hidden', padding: 40, background: 'var(--color-bg-body)', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -178,55 +178,11 @@ const ProductDetailPage: React.FC = () => {
                     </div>
                     
                     <Row gutter={[24, 32]}>
-                        {relatedProducts.map((item, index) => {
-                            const delayClass = `delay-${(index % 4 + 1) * 100}`;
-                            return (
+                        {relatedProducts.map((item, index) => (
                             <Col xs={24} sm={12} md={6} key={item.id}>
-                                <Card
-                                    className={`premium-card animate-fade-up ${delayClass}`}
-                                    hoverable
-                                    style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                    styles={{ body: { flex: 1, padding: '20px' } }}
-                                    cover={
-                                        <div className="card-img-zoom" style={{ height: 220, overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'var(--color-bg-body)' }}>
-                                            <img 
-                                                alt={item.name} 
-                                                src={item.image} 
-                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                onError={(e) => {
-                                                    const target = e.currentTarget;
-                                                    const fallbackSrc = "https://placehold.co/400x400?text=No+Image";
-                                                    if (target.src === fallbackSrc) {
-                                                        target.onerror = null; 
-                                                        target.style.display = 'none'; 
-                                                        return;
-                                                    }
-                                                    target.src = fallbackSrc;
-                                                }}
-                                            />
-                                        </div>
-                                    }
-                                    onClick={() => navigate(`/products/${item.id}`)}
-                                >
-                                    <Meta
-                                        title={
-                                            <div style={{ 
-                                                whiteSpace: 'normal', fontSize: 16, fontWeight: 600, 
-                                                lineHeight: 1.4, marginBottom: 8, display: '-webkit-box', 
-                                                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
-                                            }}>
-                                                {item.name}
-                                            </div>
-                                        }
-                                        description={
-                                            <Text strong style={{ fontSize: 18, color: 'var(--color-primary)' }}>
-                                                {item.price.toLocaleString()} đ
-                                            </Text>
-                                        }
-                                    />
-                                </Card>
+                                <ProductCard product={item} delayIndex={index} />
                             </Col>
-                        )})}
+                        ))}
                     </Row>
                 </div>
             )}

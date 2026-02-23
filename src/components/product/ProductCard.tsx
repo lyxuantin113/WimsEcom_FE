@@ -91,7 +91,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
                 title={
                     <div style={{
                         whiteSpace: 'normal', fontSize: 16, fontWeight: 700,
-                        lineHeight: 1.4, marginBottom: 12, display: '-webkit-box',
+                        lineHeight: 1.4, marginBottom: 8, display: '-webkit-box',
                         WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
                     }}>
                         {product.name}
@@ -99,11 +99,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
                 }
                 description={
                     <div>
-                        <Text type="secondary" delete style={{ marginRight: 8, fontSize: 14 }}>
+                        <Text type="secondary" delete style={{ marginRight: 8, fontSize: 14, display: 'block' }}>
                             {(product.price * 1.1).toLocaleString()} đ
                         </Text>
-                        <Text strong style={{ fontSize: 20, color: 'var(--color-primary)' }}>
+                        <Text strong style={{ fontSize: 16, color: 'var(--color-primary)', display: 'block' }}>
                             {product.price.toLocaleString()} đ
+                        </Text>
+                        <Text type="secondary" style={{ fontSize: 14, display: '-webkit-box',
+                        WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {product.description}
                         </Text>
                     </div>
                 }
