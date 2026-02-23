@@ -98,15 +98,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
                     </div>
                 }
                 description={
-                    <div>
+                    <div style={{ height: '140px' }}> {/* Cố định chiều cao phần mô tả */}
                         <Text type="secondary" delete style={{ marginRight: 8, fontSize: 14, display: 'block' }}>
                             {(product.price * 1.1).toLocaleString()} đ
                         </Text>
-                        <Text strong style={{ fontSize: 16, color: 'var(--color-primary)', display: 'block' }}>
+                        <Text strong style={{ fontSize: 16, color: 'var(--color-primary)', display: 'block', marginBottom: 8 }}>
                             {product.price.toLocaleString()} đ
                         </Text>
-                        <Text type="secondary" style={{ fontSize: 14, display: '-webkit-box',
-                        WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <Text type="secondary" style={{ 
+                            fontSize: 14, display: '-webkit-box',
+                            WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
+                        }}>
                             {product.description}
                         </Text>
                     </div>
