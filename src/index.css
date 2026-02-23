@@ -127,23 +127,29 @@ body {
   animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Utility to add delays for staggered children animations */
-.delay-100 {
-  animation-delay: 100ms;
+/* Carousel Premium Spacing & Shadow Fix */
+.carousel-premium-spacing .slick-list {
+  margin: 0 -15px !important;
+  /* Tạo offset cho padding của slide */
+  padding: 20px 0 !important;
+  /* Tạo không gian cho shadow phía trên và dưới */
 }
 
-.delay-200 {
-  animation-delay: 200ms;
+.carousel-premium-spacing .slick-slide>div {
+  padding: 0 15px !important;
+  /* Khoảng cách giữa các card */
 }
 
-.delay-300 {
-  animation-delay: 300ms;
+/* Đảm bảo toàn bộ card trong carousel có chiều cao bằng nhau */
+.carousel-premium-spacing .slick-track {
+  display: flex !important;
 }
 
-.delay-400 {
-  animation-delay: 400ms;
+.carousel-premium-spacing .slick-slide {
+  height: inherit !important;
 }
 
-.delay-500 {
-  animation-delay: 500ms;
+.carousel-premium-spacing .slick-slide>div,
+.carousel-premium-spacing .slick-slide>div>div {
+  height: 100% !important;
 }

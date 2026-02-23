@@ -6,7 +6,7 @@ import { useCart } from '../../context/CartContext';
 import cartApi from '../../api/cartApi';
 import type { ProductResponse } from '../../types/backend';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 const { Meta } = Card;
 
 interface ProductCardProps {
@@ -89,28 +89,35 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
         >
             <Meta
                 title={
-                    <div style={{
-                        whiteSpace: 'normal', fontSize: 16, fontWeight: 700,
-                        lineHeight: 1.4, marginBottom: 8, display: '-webkit-box',
-                        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
-                    }}>
+                    <Paragraph
+                        ellipsis={{ rows: 2, symbol: '...' }}
+                        style={{
+                            fontSize: 16, fontWeight: 700,
+                            lineHeight: 1.4, marginBottom: 8,
+                        }}
+                    >
                         {product.name}
-                    </div>
+                    </Paragraph>
                 }
                 description={
-                    <div style={{ height: '140px' }}> {/* Cố định chiều cao phần mô tả */}
-                        <Text type="secondary" delete style={{ marginRight: 8, fontSize: 14, display: 'block' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <Text type="secondary" delete style={{ fontSize: 13 }}>
                             {(product.price * 1.1).toLocaleString()} đ
                         </Text>
                         <Text strong style={{ fontSize: 16, color: 'var(--color-primary)', display: 'block', marginBottom: 8 }}>
                             {product.price.toLocaleString()} đ
                         </Text>
-                        <Text type="secondary" style={{ 
-                            fontSize: 14, display: '-webkit-box',
-                            WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' 
-                        }}>
+                        <Paragraph
+                            type="secondary"
+                            ellipsis={{ rows: 3, symbol: '...' }}
+                            style={{ 
+                                fontSize: 13, 
+                                lineHeight: 1.5,
+                                marginBottom: 0 
+                            }}
+                        >
                             {product.description}
-                        </Text>
+                        </Paragraph>
                     </div>
                 }
             />

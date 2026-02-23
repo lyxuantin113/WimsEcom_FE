@@ -48,41 +48,39 @@ const CategoryProductSection: React.FC<CategoryProductSectionProps> = ({ categor
             </div>
 
             <Spin spinning={loading}>
-                <div style={{ margin: '0 -15px' }}> {/* Offset cho Carousel padding */}
-                    {products.length > 0 ? (
-                        <Carousel
-                            dots={false}
-                            infinite={products.length > 4}
-                            slidesToShow={4}
-                            slidesToScroll={1}
-                            autoplay
-                            autoplaySpeed={3000}
-                            style={{ padding: '20px 0' }} // Tạo không gian cho shadow
-                            responsive={[
-                                {
-                                    breakpoint: 1200,
-                                    settings: { slidesToShow: 3 }
-                                },
-                                {
-                                    breakpoint: 768,
-                                    settings: { slidesToShow: 2 }
-                                },
-                                {
-                                    breakpoint: 480,
-                                    settings: { slidesToShow: 1 }
-                                }
-                            ]}
-                        >
-                            {products.map((product) => (
-                                <div key={product.id} style={{ padding: '0 15px 30px 15px' }}>
-                                    <ProductCard product={product} />
-                                </div>
-                            ))}
-                        </Carousel>
-                    ) : (
-                        !loading && <Empty description="Thông cảm, chưa có sản phẩm nào!" />
-                    )}
-                </div>
+                {products.length > 0 ? (
+                    <Carousel
+                        className="carousel-premium-spacing"
+                        dots={false}
+                        infinite={products.length > 4}
+                        slidesToShow={4}
+                        slidesToScroll={1}
+                        autoplay
+                        autoplaySpeed={3000}
+                        responsive={[
+                            {
+                                breakpoint: 1200,
+                                settings: { slidesToShow: 3 }
+                            },
+                            {
+                                breakpoint: 768,
+                                settings: { slidesToShow: 2 }
+                            },
+                            {
+                                breakpoint: 480,
+                                settings: { slidesToShow: 1 }
+                            }
+                        ]}
+                    >
+                        {products.map((product) => (
+                            <div key={product.id}>
+                                <ProductCard product={product} />
+                            </div>
+                        ))}
+                    </Carousel>
+                ) : (
+                    !loading && <Empty description="Thông cảm, chưa có sản phẩm nào!" />
+                )}
             </Spin>
         </div>
     );
