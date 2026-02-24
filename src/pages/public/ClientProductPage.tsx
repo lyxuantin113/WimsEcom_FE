@@ -196,6 +196,8 @@ const ClientProductPage: React.FC = () => {
                         display: 'flex', 
                         justifyContent: 'space-between', 
                         alignItems: 'center', 
+                        flexWrap: 'wrap', // CHỐNG ÉP TEXT TRÊN MOBILE
+                        gap: 16,
                         marginBottom: 32, 
                         background: '#fff', 
                         padding: '16px 24px', 
@@ -203,7 +205,7 @@ const ClientProductPage: React.FC = () => {
                         boxShadow: 'var(--shadow-sm)'
                     }}>
                         <Text style={{ fontSize: 15 }}>Tìm thấy <strong style={{color: 'var(--color-primary)'}}>{total}</strong> sản phẩm</Text>
-                        <Space size="large">
+                        <Space size="large" style={{ flexWrap: 'wrap' }}>
                             <Text style={{ fontWeight: 500 }}>Sắp xếp theo:</Text>
                             <Select
                                 value={filter.sortBy}

@@ -14,6 +14,7 @@ import CartPage from './pages/public/CartPage';
 import OrderHistoryPage from './pages/public/OrderHistoryPage';
 import ProductDetailPage from './pages/public/ProductDetailPage';
 import ClientProductPage from './pages/public/ClientProductPage';
+import AboutPage from './pages/public/AboutPage';
 
 import MainLayout from './components/layout/MainLayout';
 import PublicLayout from './components/layout/PublicLayout';
@@ -52,6 +53,7 @@ function App() {
           <Route element={<PublicLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="products" element={<ClientProductPage />} />
+              <Route path="about" element={<AboutPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/my-orders" element={<OrderHistoryPage />} />
               <Route path="/cart" element={<CartPage />} />

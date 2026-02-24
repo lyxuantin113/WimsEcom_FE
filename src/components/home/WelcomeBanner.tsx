@@ -13,7 +13,15 @@ interface Particle {
     color: string;
 }
 
-const WelcomeBanner: React.FC = () => {
+interface WelcomeBannerProps {
+    title?: string;
+    subtitle?: string;
+}
+
+const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ 
+    title = "Chào Mừng Đến Với WIMS", 
+    subtitle = "Trải nghiệm mua sắm hiện đại & phong cách" 
+}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const mouseRef = useRef({ x: 0, y: 0, active: false });
@@ -173,7 +181,7 @@ const WelcomeBanner: React.FC = () => {
                         textTransform: 'uppercase'
                     }}
                 >
-                    Chào Mừng Đến Với WIMS
+                    {title}
                 </Title>
                 <Text 
                     style={{ 
@@ -184,7 +192,7 @@ const WelcomeBanner: React.FC = () => {
                         textTransform: 'uppercase'
                     }}
                 >
-                    Trải nghiệm mua sắm hiện đại & phong cách
+                    {subtitle}
                 </Text>
             </div>
 

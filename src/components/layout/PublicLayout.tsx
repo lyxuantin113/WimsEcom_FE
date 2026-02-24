@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Menu, Button, Badge, Space, Popover, List, Typography, Avatar, Row, Col, Divider } from 'antd';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
-import { ShoppingCartOutlined, UserOutlined, LoginOutlined, LogoutOutlined, BellOutlined } from '@ant-design/icons';
+import { Layout, Menu, Button, Badge, Space, Popover, List, Typography, Avatar, Row, Col, Divider, Grid, Drawer, Dropdown } from 'antd';
+import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
+import { ShoppingCartOutlined, UserOutlined, LoginOutlined, LogoutOutlined, BellOutlined, MenuOutlined } from '@ant-design/icons';
 import { useCart } from '../../context/CartContext'; 
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
@@ -10,11 +10,20 @@ const { Header, Content, Footer } = Layout;
 const { Text, Title } = Typography;
 
 const currentUserName = localStorage.getItem('username'); 
+const { useBreakpoint } = Grid;
 
 const PublicLayout: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { totalItems } = useCart();
     const isLoggedIn = !!localStorage.getItem('access_token');
+    
+    // Breakpoints support responsive
+    const screens = useBreakpoint();
+    const isMobile = screens.md === false; // Kích thước màn hình xs, sm
+
+    // State cho Mobile Drawer
+    const [drawerVisible, setDrawerVisible] = useState(false);
 
     // State cho thông báo
     const [notifications, setNotifications] = useState<any[]>([]);
@@ -86,74 +95,146 @@ const PublicLayout: React.FC = () => {
         window.location.reload();
     };
 
+    const menuItems = [
+        { key: '/', label: <Link to="/">Trang chủ</Link> },
+        { key: '/products', label: <Link to="/products">Sản phẩm</Link> },
+        { key: '/about', label: <Link to="/about">Giới thiệu</Link> },
+        { key: '/my-orders', label: <Link to="/my-orders">Lịch sử đơn hàng</Link> }, 
+    ];
+
     return (
         <Layout style={{ minHeight: '100vh', background: 'var(--color-bg-body)' }}>
             <Header className="glass-effect" style={{ 
                 position: 'sticky', top: 0, zIndex: 1000, width: '100%', 
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 50px', height: 72, lineHeight: '72px'
+                padding: isMobile ? '0 16px' : '0 50px', height: 72, lineHeight: '72px'
             }}>
-                <div className="logo hover-lift" style={{ 
-                    fontSize: 24, fontWeight: 800, cursor: 'pointer', 
-                    color: 'var(--color-primary)', letterSpacing: '-0.5px',
-                    display: 'flex', alignItems: 'center'
-                }} onClick={() => navigate('/')}>
-                    WIMS SHOP
-                </div>
+                {isMobile ? (
+                    <>
+                        {/* ---------------- MOBILE LAYOUT ---------------- */}
+                        {/* 1. Left - Hamburger */}
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                            <Button type="text" icon={<MenuOutlined style={{ fontSize: 24, color: 'var(--color-primary)' }} />} onClick={() => setDrawerVisible(true)} />
+                        </div>
+                        
+                        {/* 2. Center - Logo */}
+                        <div className="logo" style={{ 
+                            fontSize: 22, fontWeight: 800, cursor: 'pointer', 
+                            color: 'var(--color-primary)', letterSpacing: '-0.5px',
+                            textAlign: 'center'
+                        }} onClick={() => navigate('/')}>
+                            WIMS
+                        </div>
+                        
+                        {/* 3. Right - Icons */}
+                        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 12 }}>
+                            {isLoggedIn && (
+                                <Popover 
+                                    content={notificationContent} 
+                                    title="Thông báo mới" 
+                                    trigger="click"
+                                    placement="bottomRight"
+                                    onOpenChange={(visible) => { if (visible) setUnreadCount(0); }}
+                                >
+                                    <Badge count={unreadCount} size="small" style={{ cursor: 'pointer' }}>
+                                        <BellOutlined style={{ fontSize: 20, color: 'var(--text-dark)' }} />
+                                    </Badge>
+                                </Popover>
+                            )}
+                            
+                            <Badge count={totalItems} showZero size="small" style={{ cursor: 'pointer' }} onClick={() => navigate('/cart')}>
+                                <ShoppingCartOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
+                            </Badge>
 
-                <Menu 
-                    mode="horizontal" 
-                    selectedKeys={[location.pathname]}
-                    style={{ flex: 1, borderBottom: 'none', marginLeft: 60, background: 'transparent', fontSize: 16, fontWeight: 500 }}
-                    items={[
-                        { key: '/', label: <Link to="/">Trang chủ</Link> },
-                        { key: '/products', label: <Link to="/products">Sản phẩm</Link> },
-                        { key: '/my-orders', label: <Link to="/my-orders">Lịch sử đơn hàng</Link> }, 
-                    ]} 
-                />
+                            {isLoggedIn ? (
+                                <Dropdown placement="bottomRight" menu={{ items: [
+                                    { key: 'admin', label: 'Quản trị', icon: <UserOutlined />, onClick: () => navigate('/admin') },
+                                    { type: 'divider' },
+                                    { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: handleLogout, danger: true }
+                                ]}}>
+                                    <Avatar size="small" style={{ backgroundColor: 'var(--color-primary)', cursor: 'pointer' }} icon={<UserOutlined />} />
+                                </Dropdown>
+                            ) : (
+                                <LoginOutlined style={{ fontSize: 22, color: 'var(--color-primary)', cursor: 'pointer' }} onClick={() => navigate('/login')} />
+                            )}
+                        </div>
 
-                <Space size="large" style={{ alignItems: 'center' }}>
-                    {/* --- 🔔 CÁI CHUÔNG THÔNG BÁO --- */}
-                    {isLoggedIn && (
-                        <Popover 
-                            content={notificationContent} 
-                            title="Thông báo mới" 
-                            trigger="click"
-                            placement="bottomRight"
-                            onOpenChange={(visible) => {
-                                if (visible) setUnreadCount(0); // Mở ra thì coi như đã đọc
-                            }}
+                        {/* Drawer Menu */}
+                        <Drawer
+                            title={<span style={{ fontWeight: 800, color: 'var(--color-primary)', fontSize: 20 }}>WIMS SHOP</span>}
+                            placement="left"
+                            onClose={() => setDrawerVisible(false)}
+                            open={drawerVisible}
+                            width={280}
+                            bodyStyle={{ padding: 0 }}
                         >
-                            <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }}>
-                                <Badge count={unreadCount} size="small">
-                                    <BellOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
+                            <Menu 
+                                mode="inline" 
+                                selectedKeys={[location.pathname]}
+                                items={menuItems} 
+                                style={{ borderRight: 'none', fontSize: 16, paddingTop: 16 }}
+                                onClick={() => setDrawerVisible(false)}
+                            />
+                        </Drawer>
+                    </>
+                ) : (
+                    <>
+                        {/* ---------------- DESKTOP LAYOUT ---------------- */}
+                        <div className="logo hover-lift" style={{ 
+                            fontSize: 24, fontWeight: 800, cursor: 'pointer', 
+                            color: 'var(--color-primary)', letterSpacing: '-0.5px',
+                            display: 'flex', alignItems: 'center'
+                        }} onClick={() => navigate('/')}>
+                            WIMS SHOP
+                        </div>
+
+                        <Menu 
+                            mode="horizontal" 
+                            selectedKeys={[location.pathname]}
+                            style={{ flex: 1, borderBottom: 'none', marginLeft: 60, background: 'transparent', fontSize: 16, fontWeight: 500 }}
+                            items={menuItems} 
+                        />
+
+                        <Space size="large" style={{ alignItems: 'center' }}>
+                            {isLoggedIn && (
+                                <Popover 
+                                    content={notificationContent} 
+                                    title="Thông báo mới" 
+                                    trigger="click"
+                                    placement="bottomRight"
+                                    onOpenChange={(visible) => { if (visible) setUnreadCount(0); }}
+                                >
+                                    <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }}>
+                                        <Badge count={unreadCount} size="small">
+                                            <BellOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
+                                        </Badge>
+                                    </div>
+                                </Popover>
+                            )}
+
+                            <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }} onClick={() => navigate('/cart')}>
+                                <Badge count={totalItems} showZero size="small">
+                                    <ShoppingCartOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
                                 </Badge>
                             </div>
-                        </Popover>
-                    )}
 
-                    {/* Giỏ hàng */}
-                    <div className="hover-lift" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px' }} onClick={() => navigate('/cart')}>
-                        <Badge count={totalItems} showZero size="small">
-                            <ShoppingCartOutlined style={{ fontSize: 22, color: 'var(--text-dark)' }} />
-                        </Badge>
-                    </div>
-
-                    {isLoggedIn ? (
-                        <Space size="middle" style={{ marginLeft: 16 }}>
-                            <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/admin')} style={{ fontWeight: 600 }}>
-                                {localStorage.getItem('username')}
-                            </Button>
-                            <Button danger type="text" icon={<LogoutOutlined />} onClick={handleLogout} style={{ fontWeight: 500 }}>
-                                Đăng xuất
-                            </Button>
+                            {isLoggedIn ? (
+                                <Space size="middle" style={{ marginLeft: 16 }}>
+                                    <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/admin')} style={{ fontWeight: 600 }}>
+                                        {localStorage.getItem('username')}
+                                    </Button>
+                                    <Button danger type="text" icon={<LogoutOutlined />} onClick={handleLogout} style={{ fontWeight: 500 }}>
+                                        Đăng xuất
+                                    </Button>
+                                </Space>
+                            ) : (
+                                <Button type="primary" size="large" icon={<LoginOutlined />} onClick={() => navigate('/login')} style={{ marginLeft: 16, fontWeight: 600, padding: '0 24px' }}>
+                                    Đăng nhập
+                                </Button>
+                            )}
                         </Space>
-                    ) : (
-                        <Button type="primary" size="large" icon={<LoginOutlined />} onClick={() => navigate('/login')} style={{ marginLeft: 16, fontWeight: 600, padding: '0 24px' }}>
-                            Đăng nhập
-                        </Button>
-                    )}
-                </Space>
+                    </>
+                )}
             </Header>
 
             <Content style={{ padding: '40px 50px', maxWidth: 1400, margin: '0 auto', width: '100%' }}>
@@ -189,9 +270,9 @@ const PublicLayout: React.FC = () => {
                         </Col>
                         <Col xs={24} md={8}>
                             <Title level={4} style={{ marginTop: 0, marginBottom: 24, color: '#fff' }}>Liên hệ với chúng tôi</Title>
-                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Địa chỉ: 123 Đường ABC, Quận 1, TP.HCM</Text>
-                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Email: support@wimsshop.com</Text>
-                            <Text style={{ display: 'block', color: 'rgba(255,255,255,0.65)' }}>Hotline: 1900 1234</Text>
+                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Địa chỉ: Gò Vấp, TP. Hồ Chí Minh</Text>
+                            <Text style={{ display: 'block', marginBottom: 12, color: 'rgba(255,255,255,0.65)' }}>Email: lyxuantin113@gmail.com</Text>
+                            <Text style={{ display: 'block', color: 'rgba(255,255,255,0.65)' }}>Hotline: 0912 644 361</Text>
                         </Col>
                     </Row>
                     <Divider style={{ margin: '40px 0 24px', borderColor: 'rgba(255,255,255,0.1)' }} />
