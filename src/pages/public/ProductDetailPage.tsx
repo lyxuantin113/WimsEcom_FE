@@ -7,6 +7,7 @@ import productApi from '../../api/productApi';
 import type { ProductResponse } from '../../types/backend';
 import cartApi from '../../api/cartApi';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import ProductCard from '../../components/product/ProductCard';
 
 const { Title, Text, Paragraph } = Typography;
@@ -14,6 +15,7 @@ const { Title, Text, Paragraph } = Typography;
 const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { isLoggedIn } = useAuth();
     
     const [product, setProduct] = useState<ProductResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -31,7 +33,7 @@ const ProductDetailPage: React.FC = () => {
                 setLoading(true);
                 // 1. Lấy chi tiết sản phẩm
                 const res = await productApi.getById(Number(id));
-                if (res && res.code === 1000) {
+                if (res && res.code === 1000 && res.result) {
                     setProduct(res.result);
                     
                     // 2. Sau khi lấy xong sản phẩm chính -> Lấy sản phẩm liên quan luôn
@@ -59,7 +61,7 @@ const ProductDetailPage: React.FC = () => {
     const fetchRelated = async (productId: number) => {
         try {
             const res = await productApi.getRelated(productId);
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setRelatedProducts(res.result);
             }
         } catch (e) {
@@ -69,8 +71,7 @@ const ProductDetailPage: React.FC = () => {
 
     const handleAddToCart = async () => {
         // Check 1: Phải đăng nhập mới được mua
-        const token = localStorage.getItem('access_token');
-        if (!token) {
+        if (!isLoggedIn) {
             message.warning('Vui lòng đăng nhập để mua hàng!');
             navigate('/login');
             return;

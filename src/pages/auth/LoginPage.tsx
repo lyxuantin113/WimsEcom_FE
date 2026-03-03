@@ -4,11 +4,13 @@ import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-d
 import { useNavigate } from 'react-router-dom'; 
 import authApi from '../../api/authApi';
 import type { LoginRequest, RegisterRequest } from '../../types/auth';
+import { useAuth } from '../../context/AuthContext';
 
 const { Title, Text } = Typography;
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('login'); // Trạng thái tab hiện tại
 
@@ -18,11 +20,11 @@ const LoginPage: React.FC = () => {
             setLoading(true);
             const response = await authApi.login(values);
 
-            if (response && response.code === 1000) {
+            if (response && response.code === 1000 && response.result) {
                 message.success('Đăng nhập thành công!');
-                localStorage.setItem('access_token', response.result.token);
-                localStorage.setItem('user_role', response.result.role);
-                localStorage.setItem('username', response.result.username);
+                
+                // LƯU VÀO CONTEXT (Reactive)
+                login(response.result.token, response.result.username, response.result.role);
 
                 if (response.result.role === 'ADMIN') {
                     navigate('/admin');

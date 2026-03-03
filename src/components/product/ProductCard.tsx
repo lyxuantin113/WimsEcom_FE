@@ -3,6 +3,7 @@ import { Card, Typography, message } from 'antd';
 import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import cartApi from '../../api/cartApi';
 import type { ProductResponse } from '../../types/backend';
 
@@ -17,12 +18,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
     const navigate = useNavigate();
     const { refreshCart } = useCart();
+    const { isLoggedIn } = useAuth();
 
     const delayClass = delayIndex !== undefined ? `delay-${(delayIndex % 4 + 1) * 100}` : '';
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!localStorage.getItem('access_token')) {
+        if (!isLoggedIn) {
             message.warning('Vui lòng đăng nhập để mua hàng!');
             navigate('/login');
             return;

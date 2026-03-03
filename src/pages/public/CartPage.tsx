@@ -37,7 +37,7 @@ const CartPage: React.FC = () => {
         setLoading(true);
         try {
             const res = await cartApi.getMyCart();
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setCart(res.result);
                 refreshCart();
             }
@@ -65,7 +65,7 @@ const CartPage: React.FC = () => {
         if (newQuantity < 1) return;
         try {
             const res = await cartApi.updateItem(itemId, newQuantity);
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setCart(res.result);
                 refreshCart();
                 resetDiscount(); // Reset mã giảm giá
@@ -79,7 +79,7 @@ const CartPage: React.FC = () => {
     const handleDelete = async (itemId: number) => {
         try {
             const res = await cartApi.removeItem(itemId);
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setCart(res.result);
                 refreshCart();
                 resetDiscount(); // Reset mã giảm giá
@@ -111,7 +111,7 @@ const CartPage: React.FC = () => {
 
             const res = await discountApi.calculate(payload);
             
-            if (res.code === 1000) {
+            if (res.code === 1000 && res.result) {
                 const { totalDiscount, affectedProductIds } = res.result;
                 setDiscountAmount(totalDiscount);
                 setAppliedCode(couponCode); 
@@ -153,13 +153,13 @@ const CartPage: React.FC = () => {
             // 2. Gọi API tạo đơn hàng
             const createOrderRes = await orderApi.create(orderData);
 
-            if (createOrderRes && createOrderRes.code === 1000) {
+            if (createOrderRes && createOrderRes.code === 1000 && createOrderRes.result) {
                 // 3. Phân nhánh xử lý thanh toán
                 if (paymentMethod === 'VNPAY') {
                     // === FLOW VNPAY ===
                     try {
                         const vnpayRes = await paymentApi.createVNPayUrl(createOrderRes.result.id);
-                        if (vnpayRes.code === 1000) {
+                        if (vnpayRes.code === 1000 && vnpayRes.result) {
                             window.location.href = vnpayRes.result;
                         } else {
                             message.error("Lỗi tạo link thanh toán VNPay");

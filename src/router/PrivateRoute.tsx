@@ -1,21 +1,19 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const PrivateRoute = () => {
-    // 1. Lấy thông tin từ kho
-    const token = localStorage.getItem('access_token');
-    const role = localStorage.getItem('user_role'); 
+    // 1. Lấy thông tin từ context (Reactive)
+    const { isLoggedIn, user, isAuthLoading } = useAuth();
+    
+    if (isAuthLoading) return null; // Hoặc loading spinner
 
     // 2. Check 1: Chưa đăng nhập -> Đá về Login
-    if (!token) {
+    if (!isLoggedIn) {
         return <Navigate to="/login" replace />;
     }
 
     // 3. Check 2: Đã đăng nhập nhưng KHÔNG PHẢI ADMIN -> Đá về Trang chủ
-    // (Đây là chỗ ta fix cứng theo yêu cầu của cậu)
-    if (role !== 'ADMIN') {
-        // Có thể bật dòng này lên để user hiểu tại sao bị đá
-        // message.warning('Bạn không có quyền truy cập trang quản trị!'); 
-        
+    if (user?.role !== 'ADMIN') {
         return <Navigate to="/" replace />;
     }
 

@@ -1,0 +1,13 @@
+/**
+ * In-memory storage for the Access Token.
+ * Lost on page refresh, ensuring security against XSS persistence.
+ */
+let accessToken: string | null = null;
+
+export const setToken = (token: string | null) => {
+    accessToken = token;
+};
+
+export const getToken = (): string | null => {
+    return accessToken;
+};

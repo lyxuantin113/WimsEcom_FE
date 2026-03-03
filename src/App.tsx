@@ -23,7 +23,45 @@ import PaymentResult from './pages/public/PaymentResult';
 import BannerPage from './pages/admin/BannerPage';
 import DiscountPage from './pages/admin/DiscountPage';
 
+import { Spin } from 'antd';
+import { useEffect, useState } from 'react';
+import authApi from './api/authApi';
+import { useAuth } from './context/AuthContext';
+
 function App() {
+  const [loading, setLoading] = useState(true);
+  const { login, logout } = useAuth();
+
+  useEffect(() => {
+    const silentRefresh = async () => {
+      try {
+        const hasSession = localStorage.getItem('username');
+        if (hasSession) {
+          const response = await authApi.refreshToken();
+          if (response && response.code === 1000 && response.result) {
+            // Cập nhật Context thay vì chỉ setToken lẻ loi
+            login(response.result.token, response.result.username, response.result.role);
+          }
+        }
+      } catch (error) {
+        console.error("Silent refresh failed", error);
+        logout(); // Logout sạch sẽ qua context
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    silentRefresh();
+  }, [login, logout]);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" tip="Đang tải phiên làm việc..." />
+      </div>
+    );
+  }
+
   return (
     <ConfigProvider
       theme={{

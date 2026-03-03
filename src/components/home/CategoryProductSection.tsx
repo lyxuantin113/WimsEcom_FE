@@ -21,7 +21,7 @@ const CategoryProductSection: React.FC<CategoryProductSectionProps> = ({ categor
             try {
                 // Lấy 8 sản phẩm thuộc danh mục này
                 const res = await productApi.getAll({ page: 1, size: 8, categoryId: categoryId });
-                if (res && res.code === 1000) {
+                if (res && res.code === 1000 && res.result) {
                     setProducts(res.result.data);
                 }
             } catch (error) {

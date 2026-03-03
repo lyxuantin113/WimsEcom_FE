@@ -2,8 +2,8 @@
 // <T> là Generic, nghĩa là "result" có thể là bất cứ kiểu gì (User, Product, List...)
 export interface ApiResponse<T> {
     code: number;      // Backend: private int code = 1000;
-    message: string;   // Backend: private String message;
-    result: T;         // Backend: private T result;
+    message?: string;   // Backend: private String message;
+    result?: T;         // Backend: private T result;
 }
 
 // Map 1-1 với file UserResponse.java

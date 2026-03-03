@@ -11,6 +11,14 @@ const authApi = {
     register(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
         const url = '/auth/register';
         return axiosClient.post(url, data);
+    },
+    refreshToken(): Promise<ApiResponse<LoginResponse>> {
+        const url = '/auth/refresh';
+        return axiosClient.post(url);
+    },
+    logout(): Promise<ApiResponse<void>> {
+        const url = '/auth/logout';
+        return axiosClient.post(url);
     }
 };
 

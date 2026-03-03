@@ -4,19 +4,19 @@ import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { ShoppingCartOutlined, UserOutlined, LoginOutlined, LogoutOutlined, BellOutlined, MenuOutlined } from '@ant-design/icons';
 import { useCart } from '../../context/CartContext'; 
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
+
+import { useAuth } from '../../context/AuthContext';
 
 const { Header, Content, Footer } = Layout;
 const { Text, Title } = Typography;
-
-const currentUserName = localStorage.getItem('username'); 
 const { useBreakpoint } = Grid;
 
 const PublicLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { totalItems } = useCart();
-    const isLoggedIn = !!localStorage.getItem('access_token');
+    const { isLoggedIn, user, logout } = useAuth();
     
     // Breakpoints support responsive
     const screens = useBreakpoint();
@@ -31,36 +31,36 @@ const PublicLayout: React.FC = () => {
 
     // --- LOGIC WEBSOCKET ---
     useEffect(() => {
-        if (!isLoggedIn || currentUserName === null) return;
+        if (!isLoggedIn || !user) return;
 
-        // 1. Kết nối đến Server
+        // 1. Cấu hình Stomp Client mới
         const apiUrl = import.meta.env.VITE_API_URL.replace(/\/$/, "");
-        const socket = new SockJS(`${apiUrl}/ws`);
-        const stompClient = Stomp.over(socket);
-
-        // Tắt log debug của stomp cho đỡ rác console
-        stompClient.debug = () => {};
-
-        stompClient.connect({}, () => {
-            // 2. Subscribe vào topic riêng của User: /topic/notifications/{userId}
-            stompClient.subscribe(`/topic/notifications/${currentUserName}`, (message) => {
-                const newNoti = JSON.parse(message.body);
-                
-                // 3. Có tin nhắn mới -> Cập nhật State
-                setNotifications(prev => [newNoti, ...prev]);
-                setUnreadCount(prev => prev + 1);
-                
-                // Có thể hiển thị thêm Toastify nhỏ ở góc nếu muốn
-                // toast.info(newNoti.message);
-            });
+        const client = new Client({
+            webSocketFactory: () => new SockJS(`${apiUrl}/ws`),
+            onConnect: () => {
+                // 2. Subscribe vào topic riêng của User
+                client.subscribe(`/topic/notifications/${user.username}`, (message) => {
+                    const newNoti = JSON.parse(message.body);
+                    setNotifications(prev => [newNoti, ...prev]);
+                    setUnreadCount(prev => prev + 1);
+                });
+            },
+            // Tắt debug rác
+            debug: () => {},
+            // Tự động retry nếu mất kết nối
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
         });
 
+        client.activate();
+
         return () => {
-            if (stompClient && stompClient.connected) {
-                stompClient.disconnect();
+            if (client.active) {
+                client.deactivate();
             }
         };
-    }, [isLoggedIn]);
+    }, [isLoggedIn, user]);
 
     // Nội dung hiển thị khi bấm vào chuông
     const notificationContent = (
@@ -90,9 +90,8 @@ const PublicLayout: React.FC = () => {
     );
 
     const handleLogout = () => {
-        localStorage.clear();
+        logout();
         navigate('/');
-        window.location.reload();
     };
 
     const menuItems = [
@@ -218,10 +217,10 @@ const PublicLayout: React.FC = () => {
                                 </Badge>
                             </div>
 
-                            {isLoggedIn ? (
+                            {isLoggedIn && user ? (
                                 <Space size="middle" style={{ marginLeft: 16 }}>
                                     <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/admin')} style={{ fontWeight: 600 }}>
-                                        {localStorage.getItem('username')}
+                                        {user.username}
                                     </Button>
                                     <Button danger type="text" icon={<LogoutOutlined />} onClick={handleLogout} style={{ fontWeight: 500 }}>
                                         Đăng xuất

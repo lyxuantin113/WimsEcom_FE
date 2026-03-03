@@ -24,7 +24,7 @@ const HomePage: React.FC = () => {
             setLoading(true);
             // Lấy 8 sản phẩm mới nhất để show ra trang chủ
             const res = await productApi.getAll({ page: 1, size: 8, sortBy: 'id' });
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setProducts(res.result.data);
             }
         } catch (error) {
@@ -39,7 +39,7 @@ const HomePage: React.FC = () => {
         try {
             setLoading(true);
             const res = await bannerApi.getActiveBanner();
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setBanners(res.result);
             }
         } catch (error) {
@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
     const fetchCategories = async () => {
         try {
             const res = await categoryApi.getAll({ page: 1, size: 20 });
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setCategories(res.result.data);
             }
         } catch (error) {

@@ -23,7 +23,7 @@ const OrderHistoryPage: React.FC = () => {
         setLoading(true);
         try {
             const res = await orderApi.getMyOrders({ page: 1, size: 100 }); // Lấy tạm 100 đơn mới nhất
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setOrders(res.result.data);
             }
         } catch (error) {
@@ -71,7 +71,7 @@ const OrderHistoryPage: React.FC = () => {
                     try {
                         // Gọi API tạo URL thanh toán
                         const vnpayRes = await paymentApi.createVNPayUrl(orderId);
-                        if (vnpayRes.code === 1000) {
+                        if (vnpayRes.code === 1000 && vnpayRes.result) {
                             // Redirect sang Sandbox VNPay
                             message.success("Đã thanh toán lại đơn hàng thành công");
                             fetchOrders(); // Load lại bảng

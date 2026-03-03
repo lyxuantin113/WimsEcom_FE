@@ -10,6 +10,7 @@ import productApi from '../../api/productApi';
 import categoryApi from '../../api/categoryApi';
 import type { ProductResponse, CategoryResponse } from '../../types/backend';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import cartApi from '../../api/cartApi';
 import SearchHistoryInput from '../../components/SearchHistoryInput';
 
@@ -19,6 +20,7 @@ const { Option } = Select;
 const ClientProductPage: React.FC = () => {
     const navigate = useNavigate();
     const { refreshCart } = useCart();
+    const { isLoggedIn } = useAuth();
 
     // --- STATE ---
     const [products, setProducts] = useState<ProductResponse[]>([]);
@@ -47,7 +49,7 @@ const ClientProductPage: React.FC = () => {
         const fetchCategories = async () => {
             try {
                 const res = await categoryApi.getAll({ page: 1, size: 100 });
-                if (res.code === 1000) setCategories(res.result.data);
+                if (res.code === 1000 && res.result) setCategories(res.result.data);
             } catch (err) { console.error(err); }
         };
         fetchCategories();
@@ -59,7 +61,7 @@ const ClientProductPage: React.FC = () => {
             setLoading(true);
             try {
                 const res = await productApi.getAll(filter);
-                if (res.code === 1000) {
+                if (res.code === 1000 && res.result) {
                     setProducts(res.result.data);
                     setTotal(res.result.totalElements);
                 }
@@ -300,8 +302,7 @@ const ClientProductPage: React.FC = () => {
                                                     icon={<ShoppingCartOutlined />}
                                                     onClick={async (e) => {
                                                         e.stopPropagation();
-                                                        const token = localStorage.getItem('access_token');
-                                                        if (!token) {
+                                                        if (!isLoggedIn) {
                                                             message.warning('Vui lòng đăng nhập để mua hàng!');
                                                             navigate('/login');
                                                             return;

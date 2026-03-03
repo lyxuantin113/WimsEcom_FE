@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import cartApi from '../api/cartApi';
+import { useAuth } from './AuthContext';
 
 interface CartContextType {
     totalItems: number;
@@ -10,12 +11,12 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [totalItems, setTotalItems] = useState(0);
+    const { isLoggedIn } = useAuth();
 
     // Hàm lấy dữ liệu giỏ hàng mới nhất
     const refreshCart = async () => {
-        // Check token, nếu chưa đăng nhập thì thôi
-        const token = localStorage.getItem('access_token');
-        if (!token) {
+        // Check token qua context, nếu chưa đăng nhập thì thôi
+        if (!isLoggedIn) {
             setTotalItems(0);
             return;
         }
@@ -23,7 +24,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const res = await cartApi.getMyCart();
             // @ts-ignore
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 const items = res.result.items || [];
                 // Tính tổng số lượng (Cộng dồn quantity của từng item)
                 const total = items.reduce((sum: number, item: any) => sum + item.quantity, 0);
@@ -34,10 +35,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    // Gọi lần đầu khi F5 trang
+    // Gọi lần đầu khi F5 trang hoặc khi trạng thái login thay đổi
     useEffect(() => {
         refreshCart();
-    }, []);
+    }, [isLoggedIn]);
 
     return (
         <CartContext.Provider value={{ totalItems, refreshCart }}>
