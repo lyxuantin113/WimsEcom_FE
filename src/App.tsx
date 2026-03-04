@@ -43,9 +43,13 @@ function App() {
             login(response.result.token, response.result.username, response.result.role);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Silent refresh failed", error);
-        logout(); // Logout sạch sẽ qua context
+        // THÊM: Chỉ logout nếu lỗi là 401 (nghĩa là session thực sự hết hạn)
+        // Nếu là lỗi mạng (Vercel -> Localhost bị block) thì đừng xóa localStorage của người dùng vội
+        if (error.response?.status === 401) {
+            logout();
+        }
       } finally {
         setLoading(false);
       }
