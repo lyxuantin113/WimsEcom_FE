@@ -19,7 +19,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(() => {
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('user_role');
+        return username && role ? { username, role } : null;
+    });
     const [token, setTokenState] = useState<string | null>(getToken());
     const [isAuthLoading, setIsAuthLoading] = useState(true);
 
@@ -47,22 +51,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, []);
 
-    // Khôi phục session từ localStorage
+    // Đồng bộ token từ authUtils (phòng trường hợp được set bên ngoài)
     useEffect(() => {
-        const username = localStorage.getItem('username');
-        const role = localStorage.getItem('user_role');
         const currentToken = getToken();
-
-        if (username && role && currentToken) {
-            setUser({ username, role });
+        if (currentToken && !token) {
             setTokenState(currentToken);
         }
         setIsAuthLoading(false);
-    }, []);
+    }, [token]);
 
     return (
         <AuthContext.Provider value={{ 
-            isLoggedIn: !!user && !!token, 
+            // isLoggedIn nên là true nếu có user, cho dù token chưa được refresh xong (App.tsx sẽ lo việc đó)
+            // Điều này giúp UI ổn định (giữ đúng Header) khi refresh trang.
+            isLoggedIn: !!user, 
             user, 
             login, 
             logout,
