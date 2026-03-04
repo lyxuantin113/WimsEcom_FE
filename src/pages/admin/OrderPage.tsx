@@ -24,7 +24,7 @@ const OrderPage: React.FC = () => {
             // Lưu ý: Bạn có thể cần update API getAllOrders để hỗ trợ filter theo status từ Backend
             // Ở đây mình làm filter phía Frontend cho đơn giản trước (hoặc gọi API lấy all rồi lọc)
             const res = await orderApi.getAll({ page: 1, size: 100 }); 
-            if (res && res.code === 1000) {
+            if (res && res.code === 1000 && res.result) {
                 setOrders(res.result.data);
             }
         } catch (error) {

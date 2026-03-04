@@ -35,7 +35,7 @@ const AdminProductPage: React.FC = () => {
         try {
             setLoading(true);
             const response = await productApi.getAll(params);
-            if (response && response.code === 1000) {
+            if (response && response.code === 1000 && response.result) {
                 setData(response.result.data);
                 setTotal(response.result.totalElements);
             }
@@ -48,7 +48,7 @@ const AdminProductPage: React.FC = () => {
         try {
             // Lấy 100 danh mục để tìm kiếm cho dễ
             const res = await categoryApi.getAll({ page: 1, size: 100 });
-            if(res && res.code === 1000) setCategories(res.result.data);
+            if(res && res.code === 1000 && res.result) setCategories(res.result.data);
         } catch (e) {}
     };
 

@@ -36,7 +36,7 @@ const BannerPage: React.FC = () => {
         setLoading(true);
         try {
             const res = await bannerApi.getAll();
-            if (res.code === 1000) {
+            if (res.code === 1000 && res.result) {
                 setData(res.result);
             }
         } catch (error) {

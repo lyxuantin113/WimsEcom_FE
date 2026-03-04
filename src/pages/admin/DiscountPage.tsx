@@ -24,7 +24,7 @@ const DiscountPage: React.FC = () => {
         setLoading(true);
         try {
             const res = await discountApi.getAll();
-            if (res.code === 1000) setDiscounts(res.result);
+            if (res.code === 1000 && res.result) setDiscounts(res.result);
         } catch (error) {
             message.error("Lỗi tải danh sách mã giảm giá");
         } finally {
@@ -75,7 +75,7 @@ const DiscountPage: React.FC = () => {
                 res = await discountApi.create(payload);
             }
 
-            if (res.code === 1000) {
+            if (res && res.code === 1000) {
                 message.success(editingDiscount ? "Cập nhật thành công" : "Tạo mã thành công");
                 setIsModalOpen(false);
                 fetchDiscounts();
