@@ -91,13 +91,15 @@ axiosClient.interceptors.response.use(
                         processQueue(null, newToken);
                         return axiosClient(originalRequest);
                     }
-                } catch (refreshError) {
+                } catch (refreshError: any) {
                     processQueue(refreshError, null);
-                    // Refresh fail -> logout sạch sẽ
-                    setToken(null);
-                    localStorage.removeItem('user_role');
-                    localStorage.removeItem('username');
-                    window.location.href = '/login';
+                    // CHỈ logout nếu thực sự nhận lỗi 401 (Refresh Token hết hạn)
+                    if (refreshError.response?.status === 401) {
+                        setToken(null);
+                        localStorage.removeItem('user_role');
+                        localStorage.removeItem('username');
+                        window.location.href = '/login';
+                    }
                     return Promise.reject(refreshError);
                 } finally {
                     isRefreshing = false;
