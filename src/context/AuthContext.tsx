@@ -37,12 +37,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const logout = useCallback(async () => {
         try {
-            // 1. Gọi API xóa Cookie ở BE
             await authApi.logout();
         } catch (err) {
             console.error("Logout API failed", err);
         } finally {
-            // 2. Xóa sạch state và storage ở FE bất kể API thành công hay không
             setToken(null);
             setTokenState(null);
             localStorage.removeItem('username');
@@ -51,20 +49,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, []);
 
-    // Đồng bộ token từ authUtils (phòng trường hợp được set bên ngoài)
+    // 3. Khôi phục session khi mount
     useEffect(() => {
-        const currentToken = getToken();
-        if (currentToken && !token) {
-            setTokenState(currentToken);
-        }
-        setIsAuthLoading(false);
-    }, [token]);
+        const silentRefresh = async () => {
+            const hasSession = localStorage.getItem('username');
+            if (!hasSession) {
+                setIsAuthLoading(false);
+                return;
+            }
+
+            try {
+                const response = await authApi.refreshToken();
+                if (response && response.code === 1000 && response.result) {
+                    login(response.result.token, response.result.username, response.result.role);
+                }
+            } catch (error: any) {
+                console.error("Initial recovery failed", error);
+                if (error.response?.status === 401) {
+                    logout();
+                }
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+
+        silentRefresh();
+    }, [login, logout]);
 
     return (
         <AuthContext.Provider value={{ 
-            // isLoggedIn nên là true nếu có user, cho dù token chưa được refresh xong (App.tsx sẽ lo việc đó)
-            // Điều này giúp UI ổn định (giữ đúng Header) khi refresh trang.
-            isLoggedIn: !!user, 
+            // isLoggedIn: true nếu (có user từ localStorage) VÀ (đã có token HOẶC đang trong lúc load/refresh)
+            // Điều này giúp Header giữ trạng thái "Đã đăng nhập" ngay lập tức khi F5.
+            isLoggedIn: !!user && (!!token || isAuthLoading), 
             user, 
             login, 
             logout,

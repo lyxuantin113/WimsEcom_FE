@@ -24,41 +24,12 @@ import BannerPage from './pages/admin/BannerPage';
 import DiscountPage from './pages/admin/DiscountPage';
 
 import { Spin } from 'antd';
-import { useEffect, useState } from 'react';
-import authApi from './api/authApi';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-  const [loading, setLoading] = useState(true);
-  const { login, logout } = useAuth();
+  const { isAuthLoading } = useAuth();
 
-  useEffect(() => {
-    const silentRefresh = async () => {
-      try {
-        const hasSession = localStorage.getItem('username');
-        if (hasSession) {
-          const response = await authApi.refreshToken();
-          if (response && response.code === 1000 && response.result) {
-            // Cập nhật Context thay vì chỉ setToken lẻ loi
-            login(response.result.token, response.result.username, response.result.role);
-          }
-        }
-      } catch (error: any) {
-        console.error("Silent refresh failed", error);
-        // THÊM: Chỉ logout nếu lỗi là 401 (nghĩa là session thực sự hết hạn)
-        // Nếu là lỗi mạng (Vercel -> Localhost bị block) thì đừng xóa localStorage của người dùng vội
-        if (error.response?.status === 401) {
-            logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    silentRefresh();
-  }, [login, logout]);
-
-  if (loading) {
+  if (isAuthLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Spin size="large" tip="Đang tải phiên làm việc..." />

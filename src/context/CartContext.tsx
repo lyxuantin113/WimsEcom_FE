@@ -11,10 +11,13 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [totalItems, setTotalItems] = useState(0);
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, isAuthLoading } = useAuth();
 
     // Hàm lấy dữ liệu giỏ hàng mới nhất
     const refreshCart = async () => {
+        // Nếu đang trong quá trình hồi phục session (silent refresh), chưa fetch vội
+        if (isAuthLoading) return;
+
         // Check token qua context, nếu chưa đăng nhập thì thôi
         if (!isLoggedIn) {
             setTotalItems(0);
@@ -37,8 +40,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Gọi lần đầu khi F5 trang hoặc khi trạng thái login thay đổi
     useEffect(() => {
-        refreshCart();
-    }, [isLoggedIn]);
+        if (!isAuthLoading) {
+            refreshCart();
+        }
+    }, [isLoggedIn, isAuthLoading]);
 
     return (
         <CartContext.Provider value={{ totalItems, refreshCart }}>
