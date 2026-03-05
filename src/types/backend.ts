@@ -10,7 +10,7 @@ export interface ApiResponse<T> {
 export interface UserResponse {
     id: number;
     username: string;
-    // roles?: string[]; // Sau này nếu backend trả về role thì bỏ comment dòng này
+    // roles?: string[]; 
 }
 
 // Map 1-1 với file PageResponse.java (Dùng cho phân trang sau này)

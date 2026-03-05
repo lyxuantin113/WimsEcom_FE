@@ -62,10 +62,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 const response = await authApi.refreshToken();
                 if (response && response.code === 1000 && response.result) {
                     login(response.result.token, response.result.username, response.result.role);
+                } else {
+                    // Nếu response về không như mong đợi -> logout sạch sẽ
+                    logout();
                 }
             } catch (error: any) {
                 console.error("Initial recovery failed", error);
-                if (error.response?.status === 401) {
+                // CHỈ logout nếu là lỗi Auth (400, 401, 403)
+                // Nếu là lỗi mạng (502, 503, hoặc bị browser block Mixed Content) 
+                // thì KHÔNG logout để giữ lại username/role cho người dùng thấy "cái tên" của mình.
+                const status = error.response?.status;
+                if (status === 401 || status === 400 || status === 403) {
                     logout();
                 }
             } finally {
