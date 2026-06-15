@@ -4,7 +4,7 @@ export interface LoginRequest {
     password: string;
 }
 
-// Map 1-1 với file LoginResponse.java (Mới: Không có refreshToken trong Body)
+// Map 1-1 với file LoginResponse.java
 export interface LoginResponse {
     token: string;
     username: string;

@@ -3,11 +3,14 @@ import './index.css'
 import App from './App.tsx'
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 createRoot(document.getElementById('root')!).render(
-    <AuthProvider>
-        <CartProvider>
-            <App />
-        </CartProvider>
-    </AuthProvider>
+    <Router>
+        <AuthProvider>
+            <CartProvider>
+                <App />
+            </CartProvider>
+        </AuthProvider>
+    </Router>
 )

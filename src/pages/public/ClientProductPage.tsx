@@ -2,25 +2,18 @@ import React, { useEffect, useState } from 'react';
 import {
     Row, Col, Card, Typography, Slider, Button,
     Pagination, Select, Spin, Empty, Space, Divider,
-    message
 } from 'antd';
-import { FilterOutlined, ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { FilterOutlined } from '@ant-design/icons';
 import productApi from '../../api/productApi';
 import categoryApi from '../../api/categoryApi';
 import type { ProductResponse, CategoryResponse } from '../../types/backend';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
-import cartApi from '../../api/cartApi';
 import SearchHistoryInput from '../../components/SearchHistoryInput';
+import ProductCard from '../../components/product/ProductCard';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
 const ClientProductPage: React.FC = () => {
-    const navigate = useNavigate();
-    const { refreshCart } = useCart();
-    const { isLoggedIn } = useAuth();
 
     // --- STATE ---
     const [products, setProducts] = useState<ProductResponse[]>([]);
@@ -89,8 +82,8 @@ const ClientProductPage: React.FC = () => {
             <Row gutter={[32, 32]}>
                 {/* === SIDEBAR (BÊN TRÁI) === */}
                 <Col xs={24} lg={6}>
-                    <Card 
-                        className="premium-card" 
+                    <Card
+                        className="premium-card"
                         title={<span style={{ fontWeight: 700 }}><FilterOutlined style={{ marginRight: 8 }} /> Bộ lọc</span>}
                         style={{ position: 'sticky', top: 100, borderRadius: 16 }}
                         styles={{ body: { padding: '24px' } }}
@@ -114,12 +107,12 @@ const ClientProductPage: React.FC = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                 <Text
                                     className="hover-lift"
-                                    style={{ 
-                                        cursor: 'pointer', 
+                                    style={{
+                                        cursor: 'pointer',
                                         padding: '8px 12px',
                                         borderRadius: 8,
                                         background: filter.categoryId === null ? 'var(--color-bg-body)' : 'transparent',
-                                        color: filter.categoryId === null ? 'var(--color-primary)' : 'var(--text-muted)', 
+                                        color: filter.categoryId === null ? 'var(--color-primary)' : 'var(--text-muted)',
                                         fontWeight: filter.categoryId === null ? 700 : 500,
                                         transition: 'all 0.3s ease'
                                     }}
@@ -131,12 +124,12 @@ const ClientProductPage: React.FC = () => {
                                     <Text
                                         key={cat.id}
                                         className="hover-lift"
-                                        style={{ 
-                                            cursor: 'pointer', 
+                                        style={{
+                                            cursor: 'pointer',
                                             padding: '8px 12px',
                                             borderRadius: 8,
                                             background: filter.categoryId === cat.id ? 'var(--color-bg-body)' : 'transparent',
-                                            color: filter.categoryId === cat.id ? 'var(--color-primary)' : 'var(--text-muted)', 
+                                            color: filter.categoryId === cat.id ? 'var(--color-primary)' : 'var(--text-muted)',
                                             fontWeight: filter.categoryId === cat.id ? 700 : 500,
                                             transition: 'all 0.3s ease'
                                         }}
@@ -172,8 +165,8 @@ const ClientProductPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <Button 
-                            block 
+                        <Button
+                            block
                             danger
                             type="text"
                             onClick={() => {
@@ -194,19 +187,19 @@ const ClientProductPage: React.FC = () => {
                 {/* === DANH SÁCH SẢN PHẨM (BÊN PHẢI) === */}
                 <Col xs={24} lg={18}>
                     {/* Header sắp xếp */}
-                    <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                         flexWrap: 'wrap', // CHỐNG ÉP TEXT TRÊN MOBILE
                         gap: 16,
-                        marginBottom: 32, 
-                        background: '#fff', 
-                        padding: '16px 24px', 
+                        marginBottom: 32,
+                        background: '#fff',
+                        padding: '16px 24px',
                         borderRadius: 16,
                         boxShadow: 'var(--shadow-sm)'
                     }}>
-                        <Text style={{ fontSize: 15 }}>Tìm thấy <strong style={{color: 'var(--color-primary)'}}>{total}</strong> sản phẩm</Text>
+                        <Text style={{ fontSize: 15 }}>Tìm thấy <strong style={{ color: 'var(--color-primary)' }}>{total}</strong> sản phẩm</Text>
                         <Space size="large" style={{ flexWrap: 'wrap' }}>
                             <Text style={{ fontWeight: 500 }}>Sắp xếp theo:</Text>
                             <Select
@@ -227,104 +220,17 @@ const ClientProductPage: React.FC = () => {
                     <Spin spinning={loading} size="large">
                         {products.length === 0 ? (
                             <div style={{ padding: '80px 0', textAlign: 'center' }}>
-                                <Empty description={<Text type="secondary" style={{fontSize: 16}}>Không tìm thấy sản phẩm nào phù hợp với bộ lọc</Text>} />
+                                <Empty description={<Text type="secondary" style={{ fontSize: 16 }}>Không tìm thấy sản phẩm nào phù hợp với bộ lọc</Text>} />
                             </div>
                         ) : (
                             <Row gutter={[24, 32]}>
                                 {products.map((product, index) => {
-                                    const delayClass = `delay-${(index % 4 + 1) * 100}`;
                                     return (
-                                    <Col xs={12} sm={12} md={8} lg={8} key={product.id}>
-                                        <Card
-                                            className={`premium-card animate-fade-up ${delayClass}`}
-                                            hoverable
-                                            onClick={() => navigate(`/products/${product.id}`)}
-                                            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                            styles={{ body: { flex: 1, padding: '20px' } }}
-                                            cover={
-                                                <div className="card-img-zoom" style={{ height: 260, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-body)' }}>
-                                                    <img
-                                                        alt={product.name}
-                                                        src={product.image}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                        onError={(e) => {
-                                                            const target = e.currentTarget;
-                                                            const fallbackSrc = "https://placehold.co/400x400?text=No+Image";
-                                                            if (target.src === fallbackSrc) {
-                                                                target.onerror = null;
-                                                                target.style.display = 'none';
-                                                                return;
-                                                            }
-                                                            target.src = fallbackSrc;
-                                                        }}
-                                                    />
-                                                </div>
-                                            }
-                                        >
-                                            <div style={{ marginBottom: 16 }}>
-                                                <div style={{ 
-                                                    fontSize: 16, 
-                                                    fontWeight: 600, 
-                                                    lineHeight: 1.4, 
-                                                    marginBottom: 8, 
-                                                    display: '-webkit-box', 
-                                                    WebkitLineClamp: 2, 
-                                                    WebkitBoxOrient: 'vertical', 
-                                                    overflow: 'hidden',
-                                                    minHeight: '44px'
-                                                }}>
-                                                    {product.name}
-                                                </div>
-                                                <Text type="secondary" delete style={{ fontSize: 13 }}>
-                                                    {(product.price * 1.1).toLocaleString()} đ
-                                                </Text>
-                                                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-primary)', marginTop: 2 }}>
-                                                    {product.price.toLocaleString()} đ
-                                                </div>
-                                            </div>
-
-                                            <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
-                                                <Button 
-                                                    block
-                                                    icon={<EyeOutlined />}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(`/products/${product.id}`);
-                                                    }}
-                                                    style={{ borderRadius: 8 }}
-                                                >
-                                                    Xem
-                                                </Button>
-                                                <Button 
-                                                    type="primary"
-                                                    block
-                                                    disabled={product.stockQuantity <= 0}
-                                                    icon={<ShoppingCartOutlined />}
-                                                    onClick={async (e) => {
-                                                        e.stopPropagation();
-                                                        if (!isLoggedIn) {
-                                                            message.warning('Vui lòng đăng nhập để mua hàng!');
-                                                            navigate('/login');
-                                                            return;
-                                                        }
-                                                        try {
-                                                            const res = await cartApi.addToCart(product.id, 1);
-                                                            if (res && res.code === 1000) {
-                                                                message.success('Đã thêm vào giỏ!');
-                                                                refreshCart();
-                                                            }
-                                                        } catch (error) {
-                                                            message.error('Lỗi thêm giỏ hàng');
-                                                        }
-                                                    }}
-                                                    style={{ borderRadius: 8 }}
-                                                >
-                                                    {product.stockQuantity > 0 ? 'Thêm' : 'Hết'}
-                                                </Button>
-                                            </div>
-                                        </Card>
-                                    </Col>
-                                )})}
+                                        <Col xs={12} sm={12} md={8} lg={8} key={product.id}>
+                                            <ProductCard product={product} delayIndex={index} />
+                                        </Col>
+                                    )
+                                })}
                             </Row>
                         )}
                     </Spin>

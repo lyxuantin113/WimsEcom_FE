@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    Card, Table, Button, Modal, Form, Input, 
-    Upload, InputNumber, Switch, message, Popconfirm, Tag, Space, Image, Typography 
+import {
+    Card, Table, Button, Modal, Form, Input,
+    Upload, InputNumber, Switch, message, Popconfirm, Tag, Space, Image, Typography
 } from 'antd';
-import { 
-    PlusOutlined, UploadOutlined, EditOutlined, DeleteOutlined 
+import {
+    PlusOutlined, UploadOutlined, EditOutlined, DeleteOutlined
 } from '@ant-design/icons';
 import bannerApi from '../../api/bannerApi';
 import type { BannerResponse } from '../../types/backend';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadFile } from 'antd/es/upload/interface';
 
+import BannerGallery from '../../components/home/BannerGallery';
+
 const { Text } = Typography;
 
 const BannerPage: React.FC = () => {
     const [data, setData] = useState<BannerResponse[]>([]);
     const [loading, setLoading] = useState(false);
-    
+
     // State cho Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingBanner, setEditingBanner] = useState<BannerResponse | null>(null);
-    
+
     // State cho Upload ảnh
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [previewImage, setPreviewImage] = useState<string>('');
@@ -173,10 +175,10 @@ const BannerPage: React.FC = () => {
             key: 'action',
             render: (_, record) => (
                 <Space>
-                    <Button 
-                        icon={<EditOutlined />} 
-                        type="default" 
-                        onClick={() => handleOpenModal(record)} 
+                    <Button
+                        icon={<EditOutlined />}
+                        type="default"
+                        onClick={() => handleOpenModal(record)}
                     />
                     <Popconfirm
                         title="Xóa banner này?"
@@ -205,13 +207,18 @@ const BannerPage: React.FC = () => {
             setFileList([file]);
             // Tạo preview url local
             setPreviewImage(URL.createObjectURL(file as any));
-            return false; 
+            return false;
         },
         fileList,
     };
 
     return (
         <div>
+            {/* Live Preview Section */}
+            <Card title="Live Preview (Giao diện hiển thị trang chủ)" style={{ marginBottom: 24 }}>
+                <BannerGallery banners={filteredData.filter(b => b.active).sort((a, b) => (a.priority || 0) - (b.priority || 0))} />
+            </Card>
+
             <Card title="Quản lý Banner" extra={
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => handleOpenModal()}>
                     Thêm Banner
@@ -250,13 +257,13 @@ const BannerPage: React.FC = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                             {/* Khu vực hiển thị ảnh preview */}
                             {previewImage && (
-                                <img 
-                                    src={previewImage} 
-                                    alt="Preview" 
-                                    style={{ width: '100%', maxHeight: 200, objectFit: 'contain', border: '1px dashed #d9d9d9', padding: 5 }} 
+                                <img
+                                    src={previewImage}
+                                    alt="Preview"
+                                    style={{ width: '100%', maxHeight: 200, objectFit: 'contain', border: '1px dashed #d9d9d9', padding: 5 }}
                                 />
                             )}
-                            
+
                             <Upload {...uploadProps} maxCount={1} listType="picture">
                                 <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
                             </Upload>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode, useMemo } from 'react';
 import { getToken, setToken } from '../utils/authUtils';
 import authApi from '../api/authApi';
 
@@ -7,16 +7,20 @@ interface User {
     role: string;
 }
 
-interface AuthContextType {
+interface AuthStateContextType {
     isLoggedIn: boolean;
     user: User | null;
-    login: (token: string, username: string, role: string) => void;
-    logout: () => void;
-    setIsAuthLoading: (loading: boolean) => void;
     isAuthLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthDispatchContextType {
+    login: (token: string, username: string, role: string) => void;
+    logout: () => void;
+    setIsAuthLoading: (loading: boolean) => void;
+}
+
+const AuthStateContext = createContext<AuthStateContextType | undefined>(undefined);
+const AuthDispatchContext = createContext<AuthDispatchContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(() => {
@@ -83,26 +87,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         silentRefresh();
     }, [login, logout]);
 
+    const authStateValue = useMemo(() => ({
+        isLoggedIn: !!user && (!!token || isAuthLoading),
+        user,
+        isAuthLoading,
+    }), [user, token, isAuthLoading]);
+
+    const authDispatchValue = useMemo(() => ({
+        login,
+        logout,
+        setIsAuthLoading
+    }), [login, logout]);
+
     return (
-        <AuthContext.Provider value={{ 
-            // isLoggedIn: true nếu (có user từ localStorage) VÀ (đã có token HOẶC đang trong lúc load/refresh)
-            // Điều này giúp Header giữ trạng thái "Đã đăng nhập" ngay lập tức khi F5.
-            isLoggedIn: !!user && (!!token || isAuthLoading), 
-            user, 
-            login, 
-            logout,
-            isAuthLoading,
-            setIsAuthLoading
-        }}>
-            {children}
-        </AuthContext.Provider>
+        <AuthStateContext.Provider value={authStateValue}>
+            <AuthDispatchContext.Provider value={authDispatchValue}>
+                {children}
+            </AuthDispatchContext.Provider>
+        </AuthStateContext.Provider>
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
+export const useAuthState = () => {
+    const context = useContext(AuthStateContext);
     if (!context) {
-        throw new Error('useAuth phải được dùng trong AuthProvider');
+        throw new Error('useAuthState phải được dùng trong AuthProvider');
+    }
+    return context;
+};
+
+export const useAuthDispatch = () => {
+    const context = useContext(AuthDispatchContext);
+    if (!context) {
+        throw new Error('useAuthDispatch phải được dùng trong AuthProvider');
     }
     return context;
 };

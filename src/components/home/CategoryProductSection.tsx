@@ -55,8 +55,11 @@ const CategoryProductSection: React.FC<CategoryProductSectionProps> = ({ categor
                         infinite={products.length > 4}
                         slidesToShow={4}
                         slidesToScroll={1}
-                        autoplay
-                        autoplaySpeed={3000}
+                        autoplay={true}
+                        autoplaySpeed={2500}
+                        pauseOnHover={false}
+                        pauseOnFocus={false}
+                        draggable
                         responsive={[
                             {
                                 breakpoint: 1200,

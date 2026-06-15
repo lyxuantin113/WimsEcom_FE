@@ -5,26 +5,22 @@ import { Row, Col, Image, Typography, Button, InputNumber, Divider, Space, messa
 import { ShoppingCartOutlined, ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import productApi from '../../api/productApi';
 import type { ProductResponse } from '../../types/backend';
-import cartApi from '../../api/cartApi';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
 import ProductCard from '../../components/product/ProductCard';
+import { useAddToCart } from '../../hooks/useAddToCart';
 
 const { Title, Text, Paragraph } = Typography;
 
 const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { isLoggedIn } = useAuth();
-    
+    const { isAdding, addToCart } = useAddToCart();
+
     const [product, setProduct] = useState<ProductResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
-    
+
     // State cho sản phẩm liên quan
     const [relatedProducts, setRelatedProducts] = useState<ProductResponse[]>([]);
-
-    const { refreshCart } = useCart();
 
     useEffect(() => {
         const fetchProductData = async () => {
@@ -35,7 +31,7 @@ const ProductDetailPage: React.FC = () => {
                 const res = await productApi.getById(Number(id));
                 if (res && res.code === 1000 && res.result) {
                     setProduct(res.result);
-                    
+
                     // 2. Sau khi lấy xong sản phẩm chính -> Lấy sản phẩm liên quan luôn
                     // (Gọi lồng nhau hoặc Promise.all đều được, ở đây gọi sau để chắc chắn ID tồn tại)
                     fetchRelated(Number(id));
@@ -54,7 +50,7 @@ const ProductDetailPage: React.FC = () => {
         // Reset lại số lượng khi đổi sản phẩm
         setQuantity(1);
         // Scroll lên đầu trang khi chuyển trang
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);
     }, [id, navigate]);
 
     // Hàm lấy related tách riêng cho gọn
@@ -68,36 +64,6 @@ const ProductDetailPage: React.FC = () => {
             console.error("Lỗi lấy related products", e);
         }
     }
-
-    const handleAddToCart = async () => {
-        // Check 1: Phải đăng nhập mới được mua
-        if (!isLoggedIn) {
-            message.warning('Vui lòng đăng nhập để mua hàng!');
-            navigate('/login');
-            return;
-        }
-
-        try {
-            setLoading(true); // Tận dụng biến loading hoặc tạo biến addingToCart riêng nếu muốn
-            
-            if (!product) return;
-
-            // Gọi API
-            const res = await cartApi.addToCart(product.id, quantity);
-            if (res && res.code === 1000) {
-                message.success(`Đã thêm ${quantity} sản phẩm vào giỏ!`);
-                
-                // 🟢 GỌI HÀM NÀY ĐỂ HEADER CẬP NHẬT
-                refreshCart(); 
-            } else {    
-                message.error(res.message || 'Thêm thất bại');
-            }
-        } catch (error) {
-            message.error('Lỗi khi thêm vào giỏ hàng');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}><Spin size="large" /></div>;
     if (!product) return null;
@@ -141,26 +107,26 @@ const ProductDetailPage: React.FC = () => {
                                     </Text>
                                 </div>
                                 <div style={{ marginBottom: 24 }}>
-                                    {isInStock ? 
-                                        <Tag icon={<CheckCircleOutlined />} color="success" style={{ padding: '4px 12px', fontSize: 14, borderRadius: 6 }}>Còn hàng ({product.stockQuantity})</Tag> : 
+                                    {isInStock ?
+                                        <Tag icon={<CheckCircleOutlined />} color="success" style={{ padding: '4px 12px', fontSize: 14, borderRadius: 6 }}>Còn hàng ({product.stockQuantity})</Tag> :
                                         <Tag icon={<CloseCircleOutlined />} color="error" style={{ padding: '4px 12px', fontSize: 14, borderRadius: 6 }}>Hết hàng</Tag>
                                     }
                                 </div>
                             </div>
-                            
+
                             <Divider style={{ margin: '24px 0' }} />
-                            
+
                             <Paragraph style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--text-muted)', marginBottom: 32 }}>
                                 {product.description || "Sản phẩm hiện chưa có mô tả chi tiết. Chúng tôi sẽ cập nhật trong thời gian sớm nhất."}
                             </Paragraph>
-                            
+
                             <div style={{ marginTop: 'auto', background: 'var(--color-bg-body)', padding: 24, borderRadius: 12 }}>
                                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                                     <Space size="middle" align="center">
                                         <Text strong style={{ fontSize: 16 }}>Số lượng:</Text>
-                                        <InputNumber size="large" min={1} max={product.stockQuantity} value={quantity} onChange={(val) => setQuantity(val || 1)} disabled={!isInStock} style={{ width: 100, borderRadius: 8 }}/>
+                                        <InputNumber size="large" min={1} max={product.stockQuantity} value={quantity} onChange={(val) => setQuantity(val || 1)} disabled={!isInStock} style={{ width: 100, borderRadius: 8 }} />
                                     </Space>
-                                    <Button type="primary" size="large" icon={<ShoppingCartOutlined />} onClick={handleAddToCart} disabled={!isInStock} style={{ width: '100%', height: 50, fontSize: 16, fontWeight: 600, borderRadius: 8, boxShadow: 'var(--shadow-md)' }}>
+                                    <Button type="primary" size="large" icon={<ShoppingCartOutlined />} loading={isAdding} onClick={() => addToCart(product.id, quantity)} disabled={!isInStock} style={{ width: '100%', height: 50, fontSize: 16, fontWeight: 600, borderRadius: 8, boxShadow: 'var(--shadow-md)' }}>
                                         Thêm vào giỏ hàng
                                     </Button>
                                 </Space>
@@ -177,7 +143,7 @@ const ProductDetailPage: React.FC = () => {
                         <Title level={3} style={{ fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 8 }}>Sản phẩm liên quan</Title>
                         <Text type="secondary" style={{ fontSize: 16 }}>Có thể bạn cũng sẽ thích những sản phẩm này</Text>
                     </div>
-                    
+
                     <Row gutter={[24, 32]}>
                         {relatedProducts.map((item, index) => (
                             <Col xs={24} sm={12} md={6} key={item.id}>

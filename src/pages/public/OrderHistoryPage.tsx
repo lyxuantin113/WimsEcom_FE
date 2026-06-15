@@ -5,13 +5,17 @@ import orderApi from '../../api/orderApi';
 import type { OrderResponse } from '../../types/backend';
 import dayjs from 'dayjs';
 import paymentApi from '../../api/paymentApi';
+import { useAuthState } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
 const OrderHistoryPage: React.FC = () => {
+    const { isLoggedIn } = useAuthState();
+    const navigate = useNavigate();
     const [orders, setOrders] = useState<OrderResponse[]>([]);
     const [loading, setLoading] = useState(false);
-    
+
     // State cho Modal chi tiết
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<OrderResponse | null>(null);
@@ -20,6 +24,11 @@ const OrderHistoryPage: React.FC = () => {
 
 
     const fetchOrders = async () => {
+        if (!isLoggedIn) {
+            message.error("Bạn cần đăng nhập để xem lịch sử đơn hàng");
+            navigate('/login');
+            return;
+        }
         setLoading(true);
         try {
             const res = await orderApi.getMyOrders({ page: 1, size: 100 }); // Lấy tạm 100 đơn mới nhất
@@ -86,8 +95,8 @@ const OrderHistoryPage: React.FC = () => {
                     message.error(error.response?.data?.message || "Lỗi thanh toán lại");
                 }
             }
-        });  
-    } 
+        });
+    }
 
     const handleRequestReturn = (orderId: number) => {
         Modal.confirm({
@@ -157,39 +166,39 @@ const OrderHistoryPage: React.FC = () => {
             render: (_: any, record: OrderResponse) => (
                 <Space>
                     <Tooltip title="Xem chi tiết">
-                        <Button 
-                            icon={<EyeOutlined />} 
+                        <Button
+                            icon={<EyeOutlined />}
                             onClick={() => {
                                 setSelectedOrder(record);
                                 setIsModalOpen(true);
-                            }} 
+                            }}
                         />
                     </Tooltip>
 
                     {/* Thanh toán lại đơn Pending_Payment */}
                     {(record.status === 'PENDING_PAYMENT') && (
                         <Tooltip title="Thanh toán lại">
-                            <Button 
-                                icon={<CreditCardOutlined />} 
+                            <Button
+                                icon={<CreditCardOutlined />}
                                 onClick={() => handlePayAgain(record.id)}
                             />
                         </Tooltip>
                     )}
-                    
+
                     {/* Chỉ hiện nút Hủy nếu đơn là PENDING hoặc CONFIRMED */}
                     {(record.status === 'PENDING_CONFIRMATION' || record.status === 'PENDING_PAYMENT' || record.status === 'CONFIRMED') && (
                         <Tooltip title="Hủy đơn hàng">
-                            <Button 
-                                danger 
-                                icon={<CloseCircleOutlined />} 
+                            <Button
+                                danger
+                                icon={<CloseCircleOutlined />}
                                 onClick={() => handleCancel(record.id)}
                             />
                         </Tooltip>
                     )}
 
                     {record.status === 'COMPLETED' && (
-                        <Tooltip 
-                            title="Yêu cầu trả hàng?" 
+                        <Tooltip
+                            title="Yêu cầu trả hàng?"
                         >
                             <Button icon={<UndoOutlined />} type="default" danger onClick={() => handleRequestReturn(record.id)}></Button>
                         </Tooltip>
@@ -217,16 +226,16 @@ const OrderHistoryPage: React.FC = () => {
         <div className="animate-fade-up" style={{ padding: '20px 20px 60px 20px', maxWidth: 1200, margin: '0 auto' }}>
             <Title level={2} style={{ fontWeight: 800, letterSpacing: '-0.5px', marginBottom: 32 }}>Lịch sử đơn hàng</Title>
             <Card className="premium-card" bordered={false} styles={{ body: { padding: '24px' } }}>
-                <Tabs 
-                    defaultActiveKey="ALL" 
-                    items={tabItems} 
+                <Tabs
+                    defaultActiveKey="ALL"
+                    items={tabItems}
                     onChange={setSelectedStatus}
                 />
 
-                <Table 
-                    columns={columns} 
-                    dataSource={filteredStatusOrders} 
-                    rowKey="id" 
+                <Table
+                    columns={columns}
+                    dataSource={filteredStatusOrders}
+                    rowKey="id"
                     loading={loading}
                     pagination={{ pageSize: 10, position: ['bottomCenter'] }}
                     scroll={{ x: 'max-content' }}
@@ -251,7 +260,7 @@ const OrderHistoryPage: React.FC = () => {
                                 <p><strong>Mã giảm giá:</strong> {selectedOrder.discountCode}</p>
                             )}
                         </div>
-                        
+
                         <Table
                             dataSource={selectedOrder.orderDetails}
                             rowKey="id"
@@ -268,8 +277,8 @@ const OrderHistoryPage: React.FC = () => {
                                     )
                                 },
                                 { title: 'Số lượng', dataIndex: 'quantity' },
-                                { 
-                                    title: 'Đơn giá', 
+                                {
+                                    title: 'Đơn giá',
                                     dataIndex: 'price',
                                     render: (price) => `${price.toLocaleString()} đ`
                                 },
@@ -283,15 +292,15 @@ const OrderHistoryPage: React.FC = () => {
                             ]}
                         />
                         <div style={{ marginTop: 20, textAlign: 'right' }}>
-                            { selectedOrder.discountCode !== null && selectedOrder.discountCode.length > 0 && 
-                            <div>
-                                <Title level={5} type="danger">
-                                    Tổng cộng: {(selectedOrder.totalAmount + selectedOrder.discountAmount).toLocaleString()} đ
-                                </Title>
-                                <Title level={5} type="danger">
-                                    Giảm giá: {selectedOrder.discountAmount.toLocaleString()} đ
-                                </Title>
-                            </div>
+                            {selectedOrder.discountCode !== null && selectedOrder.discountCode.length > 0 &&
+                                <div>
+                                    <Title level={5} type="danger">
+                                        Tổng cộng: {(selectedOrder.totalAmount + selectedOrder.discountAmount).toLocaleString()} đ
+                                    </Title>
+                                    <Title level={5} type="danger">
+                                        Giảm giá: {selectedOrder.discountAmount.toLocaleString()} đ
+                                    </Title>
+                                </div>
                             }
                             <Title level={4} type="danger">
                                 Tổng tiền: {selectedOrder.totalAmount.toLocaleString()} đ

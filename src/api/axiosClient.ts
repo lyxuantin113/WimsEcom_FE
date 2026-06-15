@@ -98,7 +98,7 @@ axiosClient.interceptors.response.use(
                         setToken(null);
                         localStorage.removeItem('user_role');
                         localStorage.removeItem('username');
-                        window.location.href = '/login';
+                        window.dispatchEvent(new Event('auth_unauthorized'));
                     }
                     return Promise.reject(refreshError);
                 } finally {

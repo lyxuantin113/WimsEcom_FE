@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Tabs } from 'antd'; 
+import { Form, Input, Button, Card, Typography, message, Tabs } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import authApi from '../../api/authApi';
 import type { LoginRequest, RegisterRequest } from '../../types/auth';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthDispatch } from '../../context/AuthContext';
 
 const { Title, Text } = Typography;
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login } = useAuthDispatch();
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('login'); // Trạng thái tab hiện tại
 
@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
 
             if (response && response.code === 1000 && response.result) {
                 message.success('Đăng nhập thành công!');
-                
+
                 // LƯU VÀO CONTEXT (Reactive)
                 login(response.result.token, response.result.username, response.result.role);
 
@@ -62,12 +62,12 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100vh', 
-            backgroundColor: '#f0f2f5' 
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            backgroundColor: '#f0f2f5'
         }}>
             <Card style={{ width: 450, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                 <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -75,8 +75,8 @@ const LoginPage: React.FC = () => {
                     <Text type="secondary">Chào mừng bạn đến với Wims!</Text>
                 </div>
 
-                <Tabs 
-                    activeKey={activeTab} 
+                <Tabs
+                    activeKey={activeTab}
                     onChange={(key) => setActiveTab(key)}
                     centered
                     items={[

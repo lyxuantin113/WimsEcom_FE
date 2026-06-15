@@ -1,14 +1,11 @@
 import React from 'react';
-import { Card, Typography, message } from 'antd';
+import { Button, Card, Typography } from 'antd';
 import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
-import cartApi from '../../api/cartApi';
 import type { ProductResponse } from '../../types/backend';
+import { useAddToCart } from '../../hooks/useAddToCart';
 
-const { Text, Paragraph } = Typography;
-const { Meta } = Card;
+const { Text } = Typography;
 
 interface ProductCardProps {
     product: ProductResponse;
@@ -17,28 +14,9 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
     const navigate = useNavigate();
-    const { refreshCart } = useCart();
-    const { isLoggedIn } = useAuth();
+    const { isAdding, addToCart } = useAddToCart();
 
     const delayClass = delayIndex !== undefined ? `delay-${(delayIndex % 4 + 1) * 100}` : '';
-
-    const handleAddToCart = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!isLoggedIn) {
-            message.warning('Vui lòng đăng nhập để mua hàng!');
-            navigate('/login');
-            return;
-        }
-        try {
-            const res = await cartApi.addToCart(product.id, 1);
-            if (res && res.code === 1000) {
-                message.success('Đã thêm vào giỏ!');
-                refreshCart();
-            }
-        } catch (error) {
-            message.error('Lỗi thêm giỏ hàng');
-        }
-    };
 
     return (
         <Card
@@ -46,13 +24,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
             hoverable
             onClick={() => navigate(`/products/${product.id}`)}
             style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-            styles={{ body: { flex: 1, padding: '24px' } }}
+            styles={{ body: { flex: 1, padding: '20px', display: 'flex', flexDirection: 'column' } }}
             cover={
-                <div className="card-img-zoom" style={{ height: 260, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+                <div className="card-img-zoom" style={{ height: 260, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg-body)' }}>
                     <img
                         alt={product.name}
                         src={product.image}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', aspectRatio: 4 / 3 }}
                         onError={(e) => {
                             const target = e.currentTarget;
                             const fallbackSrc = "https://placehold.co/400x400?text=No+Image";
@@ -66,63 +44,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delayIndex }) => {
                     />
                 </div>
             }
-            actions={[
-                <div className="hover-lift" onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/products/${product.id}`);
-                }} key="view" style={{ padding: '12px 0' }}>
-                    <EyeOutlined style={{ marginRight: 6 }} /> Xem chi tiết
-                </div>,
-                product.stockQuantity > 0 ? (
-                    <div
-                        className="hover-lift"
-                        key="cart"
-                        style={{ padding: '12px 0', color: 'var(--color-primary)', fontWeight: 600 }}
-                        onClick={handleAddToCart}
-                    >
-                        <ShoppingCartOutlined style={{ marginRight: 6, fontSize: 16 }} /> Bỏ vào giỏ
-                    </div>
-                ) : (
-                    <div key="cart" onClick={(e) => e.stopPropagation()} style={{ padding: '12px 0', color: '#ff4d4f', cursor: 'not-allowed' }}>
-                        <ShoppingCartOutlined style={{ marginRight: 6 }} /> Hết hàng
-                    </div>
-                )
-            ]}
         >
-            <Meta
-                title={
-                    <Paragraph
-                        ellipsis={{ rows: 2, symbol: '...' }}
-                        style={{
-                            fontSize: 16, fontWeight: 700,
-                            lineHeight: 1.4, marginBottom: 8,
-                        }}
-                    >
-                        {product.name}
-                    </Paragraph>
-                }
-                description={
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <Text type="secondary" delete style={{ fontSize: 13 }}>
-                            {(product.price * 1.1).toLocaleString()} đ
-                        </Text>
-                        <Text strong style={{ fontSize: 16, color: 'var(--color-primary)', display: 'block', marginBottom: 8 }}>
-                            {product.price.toLocaleString()} đ
-                        </Text>
-                        <Paragraph
-                            type="secondary"
-                            ellipsis={{ rows: 3, symbol: '...' }}
-                            style={{ 
-                                fontSize: 13, 
-                                lineHeight: 1.5,
-                                marginBottom: 0 
-                            }}
-                        >
-                            {product.description}
-                        </Paragraph>
+            <div style={{ marginBottom: 16 }}>
+                <div style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    lineHeight: 1.4,
+                    marginBottom: 8,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                }}>
+                    {product.name}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text type="secondary" delete style={{ fontSize: 13 }}>
+                        {(product.price * 1.1).toLocaleString()} đ
+                    </Text>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-primary)', marginTop: 2 }}>
+                        {product.price.toLocaleString()} đ
                     </div>
-                }
-            />
+                </div>
+            </div>
+
+            <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
+                <Button
+                    block
+                    icon={<EyeOutlined />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/products/${product.id}`);
+                    }}
+                    style={{ borderRadius: 8 }}
+                >
+                    Xem
+                </Button>
+                <Button
+                    type="primary"
+                    block
+                    disabled={product.stockQuantity <= 0}
+                    loading={isAdding}
+                    icon={<ShoppingCartOutlined />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product.id, 1);
+                    }}
+                    style={{ borderRadius: 8 }}
+                >
+                    {product.stockQuantity > 0 ? 'Thêm' : 'Hết'}
+                </Button>
+            </div>
         </Card>
     );
 };

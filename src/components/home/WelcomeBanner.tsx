@@ -18,9 +18,9 @@ interface WelcomeBannerProps {
     subtitle?: string;
 }
 
-const WelcomeBanner: React.FC<WelcomeBannerProps> = ({ 
-    title = "Chào Mừng Đến Với WIMS", 
-    subtitle = "Trải nghiệm mua sắm hiện đại & phong cách" 
+const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
+    title = "Chào Mừng Đến Với WIMS",
+    subtitle = "Trải nghiệm mua sắm hiện đại & phong cách"
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +47,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
             ctx.scale(pixelRatio, pixelRatio);
-            
+
             initParticles(width, height);
         };
 
@@ -80,7 +80,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
                     const dx = mouseRef.current.x - p.x;
                     const dy = mouseRef.current.y - p.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     const maxDistance = 150; // Giảm khoảng cách tương tác để tinh tế hơn
                     if (distance < maxDistance) {
                         const forceDirectionX = dx / distance;
@@ -143,17 +143,15 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     }, []);
 
     return (
-        <div 
+        <div
             ref={containerRef}
             className="welcome-banner-container"
-            style={{ 
-                position: 'relative', 
-                width: '100%', 
-                height: '75vh', 
-                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', 
-                borderRadius: '16px', 
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '85vh',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
                 overflow: 'hidden',
-                marginBottom: '40px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -161,17 +159,17 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
                 boxShadow: 'var(--shadow-md)'
             }}
         >
-            <canvas 
+            <canvas
                 ref={canvasRef}
                 style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
             />
-            
+
             <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', pointerEvents: 'none' }}>
-                <Title 
+                <Title
                     className="animate-glow"
-                    style={{ 
-                        fontSize: '48px', 
-                        fontWeight: 900, 
+                    style={{
+                        fontSize: '48px',
+                        fontWeight: 900,
                         fontFamily: 'Gotham Rounded',
                         marginBottom: '12px',
                         background: 'linear-gradient(45deg, var(--color-primary), #662e25)',
@@ -183,10 +181,10 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
                 >
                     {title}
                 </Title>
-                <Text 
-                    style={{ 
-                        fontSize: '18px', 
-                        color: 'var(--text-muted)', 
+                <Text
+                    style={{
+                        fontSize: '18px',
+                        color: 'var(--text-muted)',
                         fontWeight: 500,
                         letterSpacing: '1px',
                         textTransform: 'uppercase'
