@@ -56,8 +56,8 @@ axiosClient.interceptors.response.use(
 
         // Xử lý các lỗi chung
         if (error.response) {
-            // Nếu server trả về 401 (Hết hạn login) và không phải request refresh chính nó
-            if (error.response.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
+            // Nếu server trả về 401 hoặc 403 (Hết hạn login nhưng bị config lỗi backend) và không phải request refresh chính nó
+            if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
                 if (isRefreshing) {
                     return new Promise(function (resolve, reject) {
                         failedQueue.push({ resolve, reject });
@@ -93,8 +93,8 @@ axiosClient.interceptors.response.use(
                     }
                 } catch (refreshError: any) {
                     processQueue(refreshError, null);
-                    // CHỈ logout nếu thực sự nhận lỗi 401 (Refresh Token hết hạn)
-                    if (refreshError.response?.status === 401) {
+                    // CHỈ logout nếu thực sự nhận lỗi 401 hoặc 403 (Refresh Token hết hạn)
+                    if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
                         setToken(null);
                         localStorage.removeItem('user_role');
                         localStorage.removeItem('username');

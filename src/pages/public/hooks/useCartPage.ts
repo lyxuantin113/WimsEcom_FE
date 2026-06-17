@@ -1,50 +1,39 @@
-import React, { useState } from 'react';
-import { Typography, message, Form, Spin } from 'antd';
+import { useState, useCallback } from 'react';
+import { message, Form } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import cartApi from '../../api/cartApi';
-import orderApi from '../../api/orderApi';
-import paymentApi from '../../api/paymentApi';
-import discountApi from '../../api/discountApi';
-import { useCart } from '../../context/CartContext';
+import cartApi from '../../../api/cartApi';
+import orderApi from '../../../api/orderApi';
+import paymentApi from '../../../api/paymentApi';
+import discountApi from '../../../api/discountApi';
+import { useCart } from '../../../context/CartContext';
 
-import CartEmpty from '../../components/cart/CartEmpty';
-import CartTable from '../../components/cart/CartTable';
-import CartSummary from '../../components/cart/CartSummary';
-import CheckoutModal from '../../components/cart/CheckoutModal';
-
-const { Title } = Typography;
-
-const CartPage: React.FC = () => {
+export const useCartPage = () => {
     const navigate = useNavigate();
-    const { cart, setCart, refreshCart, isCartLoading } = useCart(); // Lấy từ Context
+    const { cart, setCart, refreshCart, isCartLoading } = useCart();
 
-    // loading chỉ dùng khi Update/Delete item
-    const [loading, _] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    // --- STATE DISCOUNT ---
-    const [couponCode, setCouponCode] = useState(''); // Mã đang nhập
-    const [appliedCode, setAppliedCode] = useState(''); // Mã đã áp dụng thành công
-    const [discountAmount, setDiscountAmount] = useState(0); // Số tiền được giảm
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCode, setAppliedCode] = useState('');
+    const [discountAmount, setDiscountAmount] = useState(0);
     const [isCheckingCode, setIsCheckingCode] = useState(false);
-    const [affectedProductIds, setAffectedProductIds] = useState<number[]>([]); // Các Sản phẩm được discount
+    const [affectedProductIds, setAffectedProductIds] = useState<number[]>([]);
 
-    // Modal & Form State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [form] = Form.useForm();
     const [paymentMethod, setPaymentMethod] = useState<'COD' | 'VNPAY'>('COD');
 
-    // Reset discount khi giỏ hàng thay đổi
-    const resetDiscount = () => {
+    const resetDiscount = useCallback(() => {
         setAppliedCode('');
         setDiscountAmount(0);
         setCouponCode('');
         setAffectedProductIds([]);
-    };
+    }, []);
 
-    // Xử lý tăng giảm số lượng
-    const handleQuantityChange = async (itemId: number, newQuantity: number) => {
+    const handleQuantityChange = useCallback(async (itemId: number, newQuantity: number) => {
         if (newQuantity < 1) return;
+        setLoading(true);
         try {
             const res = await cartApi.updateItem(itemId, newQuantity);
             if (res && res.code === 1000 && res.result) {
@@ -54,11 +43,13 @@ const CartPage: React.FC = () => {
             }
         } catch (error: any) {
             message.error('Lỗi cập nhật');
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [setCart, refreshCart, resetDiscount]);
 
-    // Xử lý xóa item
-    const handleDelete = async (itemId: number) => {
+    const handleDelete = useCallback(async (itemId: number) => {
+        setLoading(true);
         try {
             const res = await cartApi.removeItem(itemId);
             if (res && res.code === 1000 && res.result) {
@@ -69,11 +60,12 @@ const CartPage: React.FC = () => {
             }
         } catch (error) {
             message.error('Lỗi xóa sản phẩm');
+        } finally {
+            setLoading(false);
         }
-    };
+    }, [setCart, refreshCart, resetDiscount]);
 
-    // --- LOGIC DISCOUNT ---
-    const handleApplyCoupon = async () => {
+    const handleApplyCoupon = useCallback(async () => {
         if (!couponCode.trim()) {
             message.warning("Vui lòng nhập mã giảm giá");
             return;
@@ -106,10 +98,9 @@ const CartPage: React.FC = () => {
         } finally {
             setIsCheckingCode(false);
         }
-    };
+    }, [couponCode, cart]);
 
-    // --- LOGIC CHECKOUT ---
-    const handleCheckoutSubmit = async (values: any) => {
+    const handleCheckoutSubmit = useCallback(async (values: any) => {
         if (!cart || cart.items.length === 0) return;
 
         setCheckoutLoading(true);
@@ -156,75 +147,37 @@ const CartPage: React.FC = () => {
         } finally {
             setCheckoutLoading(false);
         }
-    };
+    }, [cart, paymentMethod, appliedCode, navigate, setCart, refreshCart]);
 
-    const handleOpenModal = () => {
+    const handleOpenModal = useCallback(() => {
         setIsModalOpen(true);
         form.resetFields();
-    };
+    }, [form]);
 
     const finalTotal = cart ? Math.max(0, cart.totalAmount - discountAmount) : 0;
 
-    if (isCartLoading) {
-        return <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>;
-    }
-
-    if (!cart || cart.items.length === 0) {
-        return <CartEmpty />;
-    }
-
-    return (
-        <div className="animate-fade-up" style={{ padding: '20px 0px 60px 0px', maxWidth: 1200, margin: '0 auto' }}>
-            <Title level={2} style={{ marginBottom: 40, fontWeight: 800, letterSpacing: '-0.5px' }}>Giỏ hàng của bạn</Title>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 40, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-
-                    {/* BẢNG DANH SÁCH SẢN PHẨM */}
-                    <div style={{ flex: 2, minWidth: 300 }}>
-                        <CartTable
-                            items={cart.items}
-                            loading={loading}
-                            affectedProductIds={affectedProductIds}
-                            onQuantityChange={handleQuantityChange}
-                            onDelete={handleDelete}
-                        />
-                    </div>
-
-                    {/* TỔNG TIỀN & MÃ GIẢM GIÁ */}
-                    <div style={{ flex: 1, minWidth: 350 }}>
-                        <CartSummary
-                            totalAmount={cart.totalAmount}
-                            discountAmount={discountAmount}
-                            couponCode={couponCode}
-                            appliedCode={appliedCode}
-                            isCheckingCode={isCheckingCode}
-                            finalTotal={finalTotal}
-                            setCouponCode={setCouponCode}
-                            handleApplyCoupon={handleApplyCoupon}
-                            resetDiscount={resetDiscount}
-                            handleOpenModal={handleOpenModal}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* MODAL CHECKOUT */}
-            <CheckoutModal
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                form={form}
-                handleCheckoutSubmit={handleCheckoutSubmit}
-                checkoutLoading={checkoutLoading}
-                paymentMethod={paymentMethod}
-                setPaymentMethod={setPaymentMethod}
-                cartTotal={cart.totalAmount}
-                discountAmount={discountAmount}
-                appliedCode={appliedCode}
-                finalTotal={finalTotal}
-            />
-        </div>
-    );
+    return {
+        cart,
+        isCartLoading,
+        loading,
+        couponCode,
+        setCouponCode,
+        appliedCode,
+        discountAmount,
+        isCheckingCode,
+        affectedProductIds,
+        isModalOpen,
+        setIsModalOpen,
+        checkoutLoading,
+        form,
+        paymentMethod,
+        setPaymentMethod,
+        finalTotal,
+        handleQuantityChange,
+        handleDelete,
+        handleApplyCoupon,
+        resetDiscount,
+        handleCheckoutSubmit,
+        handleOpenModal
+    };
 };
-
-export default CartPage;

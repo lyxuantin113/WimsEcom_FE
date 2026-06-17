@@ -6,24 +6,27 @@ import { useEffect } from 'react';
 import PrivateRoute from './router/PrivateRoute';
 import LoginPage from './pages/auth/LoginPage';
 
-import CategoryPage from './pages/admin/CategoryPage';
-import AdminProductPage from './pages/admin/ProductPage';
-import OrderPage from './pages/admin/OrderPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import CategoryPage from './pages/admin/category/CategoryPage';
+import AdminProductPage from './pages/admin/product/ProductPage';
+import OrderPage from './pages/admin/order/OrderPage';
+import AdminDashboard from './pages/admin/dashboard/AdminDashboard';
 
-import HomePage from './pages/public/HomePage';
-import CartPage from './pages/public/CartPage';
-import OrderHistoryPage from './pages/public/OrderHistoryPage';
-import ProductDetailPage from './pages/public/ProductDetailPage';
-import ClientProductPage from './pages/public/ClientProductPage';
+import HomePage from './pages/public/home/HomePage';
+import CartPage from './pages/public/cart/CartPage';
+import OrderHistoryPage from './pages/public/order-history/OrderHistoryPage';
+import ProductDetailPage from './pages/public/product-detail/ProductDetailPage';
+import ClientProductPage from './pages/public/client-product/ClientProductPage';
 import AboutPage from './pages/public/AboutPage';
 
 import MainLayout from './components/layout/MainLayout';
 import PublicLayout from './components/layout/PublicLayout';
 
 import PaymentResult from './pages/public/PaymentResult';
-import BannerPage from './pages/admin/BannerPage';
-import DiscountPage from './pages/admin/DiscountPage';
+import BannerPage from './pages/admin/banner/BannerPage';
+import DiscountPage from './pages/admin/discount/DiscountPage';
+import SupplierPage from './pages/admin/supplier/SupplierPage';
+import ProcurementPage from './pages/admin/procurement/ProcurementPage';
+import InventoryPage from './pages/admin/inventory/InventoryPage';
 
 import { Spin } from 'antd';
 import { useAuthState, useAuthDispatch } from './context/AuthContext';
@@ -105,6 +108,9 @@ function App() {
             <Route path="orders" element={<OrderPage />} /> {/* /admin/orders */}
             <Route path="banners" element={<BannerPage />} /> {/* /admin/banners */}
             <Route path="discounts" element={<DiscountPage />} /> {/* /admin/discounts */}
+            <Route path="suppliers" element={<SupplierPage />} /> {/* /admin/suppliers */}
+            <Route path="procurements" element={<ProcurementPage />} /> {/* /admin/procurements */}
+            <Route path="inventory" element={<InventoryPage />} /> {/* /admin/inventory */}
           </Route>
         </Route>
 

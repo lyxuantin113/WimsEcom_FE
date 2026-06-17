@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Button, InputNumber, Typography, Space, Image, Popconfirm, Tag } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import type { CartItemResponse } from '../../types/backend';
+import type { CartItemResponse } from '../../../../types/backend';
 
 const { Text } = Typography;
 
@@ -13,12 +13,12 @@ interface CartTableProps {
     onDelete: (itemId: number) => void;
 }
 
-const CartTable: React.FC<CartTableProps> = ({ 
-    items, 
-    loading, 
-    affectedProductIds, 
-    onQuantityChange, 
-    onDelete 
+const CartTable: React.FC<CartTableProps> = ({
+    items,
+    loading,
+    affectedProductIds,
+    onQuantityChange,
+    onDelete
 }) => {
     const columns = [
         {
@@ -33,10 +33,10 @@ const CartTable: React.FC<CartTableProps> = ({
                         <div style={{ maxWidth: 200 }}>
                             <Text strong>{text}</Text>
                             {isDiscounted && (
-                                <Tag color="red" style={{ 
-                                    position: 'absolute', top: -5, left: -5, 
-                                    fontSize: 16, padding: '2px 6px', margin: 0, 
-                                    zIndex: 1, boxShadow: '0 2px 6px rgba(0,0,0,0.3)' 
+                                <Tag color="red" style={{
+                                    position: 'absolute', top: -5, left: -5,
+                                    fontSize: 16, padding: '2px 6px', margin: 0,
+                                    zIndex: 1, boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
                                 }}>
                                     -SALE
                                 </Tag>
@@ -58,9 +58,9 @@ const CartTable: React.FC<CartTableProps> = ({
             dataIndex: 'quantity',
             key: 'quantity',
             render: (quantity: number, record: CartItemResponse) => (
-                <InputNumber 
-                    min={1} 
-                    value={quantity} 
+                <InputNumber
+                    min={1}
+                    value={quantity}
                     onChange={(val) => onQuantityChange(record.id, Number(val))}
                     style={{ width: 60 }}
                 />
@@ -83,11 +83,11 @@ const CartTable: React.FC<CartTableProps> = ({
     ];
 
     return (
-        <Table 
-            columns={columns} 
-            dataSource={items} 
-            rowKey="id" 
-            pagination={false} 
+        <Table
+            columns={columns}
+            dataSource={items}
+            rowKey="id"
+            pagination={false}
             loading={loading}
             scroll={{ x: 600 }}
         />

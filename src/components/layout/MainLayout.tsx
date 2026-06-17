@@ -81,6 +81,24 @@ const MainLayout: React.FC = () => {
                             icon: <DiscordOutlined />,
                             label: 'Quản lý Mã giảm giá',
                             onClick: () => navigate('/admin/discounts'),
+                        },
+                        {
+                            key: '/admin/suppliers',
+                            icon: <ShoppingOutlined />,
+                            label: 'Nhà Cung Cấp',
+                            onClick: () => navigate('/admin/suppliers'),
+                        },
+                        {
+                            key: '/admin/procurements',
+                            icon: <OrderedListOutlined />,
+                            label: 'Phiếu Nhập Kho',
+                            onClick: () => navigate('/admin/procurements'),
+                        },
+                        {
+                            key: '/admin/inventory',
+                            icon: <DashboardOutlined />,
+                            label: 'Lịch Sử Kho',
+                            onClick: () => navigate('/admin/inventory'),
                         }
                     ]}
                 />

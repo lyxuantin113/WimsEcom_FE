@@ -1,49 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Statistic, Typography, message, Select, Space, Tag, Table } from 'antd'; // Thêm Select, Space
+import React from 'react';
+import { Card, Col, Row, Statistic, Typography, Select, Space, Tag, Table } from 'antd';
 import { DollarOutlined, ShoppingCartOutlined, UserOutlined, AppstoreOutlined, CalendarOutlined } from '@ant-design/icons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import axiosClient from '../../api/axiosClient';
-import dayjs from 'dayjs';
+import { useDashboard } from '../hooks/useDashboard';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const AdminDashboard: React.FC = () => {
-    const [stats, setStats] = useState<any>(null);
-    
-    // 1. State lưu năm được chọn (Mặc định là năm nay)
-    const currentYear = dayjs().year();
-    const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-
-    // 2. Hàm tạo danh sách năm (Từ 2023 -> Năm hiện tại)
-    const getYearOptions = () => {
-        const startYear = 2023; // Năm bắt đầu dự án
-        const years = [];
-        // Vòng lặp lùi từ năm nay về năm bắt đầu
-        for (let i = currentYear; i >= startYear; i--) {
-            years.push(i);
-        }
-        return years;
-    };
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                // 3. Truyền params year lên API
-                const res: any = await axiosClient.get('/admin/stats', {
-                    params: { year: selectedYear } 
-                });
-                
-                if (res.code === 1000) {
-                    setStats(res.result);
-                }
-            } catch (error) {
-                message.error('Lỗi tải thống kê');
-            }
-        };
-        
-        fetchStats();
-    }, [selectedYear]); // 4. Quan trọng: Khi selectedYear đổi -> Chạy lại useEffect -> Gọi lại API
+    const { stats, loading, selectedYear, setSelectedYear, getYearOptions } = useDashboard();
 
     const topProductColumns = [
         {
@@ -72,7 +37,6 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="animate-fade-up" style={{ padding: '24px', background: 'var(--color-bg-body)', minHeight: '100vh' }}>
-            {/* Header: Tiêu đề + Bộ lọc Năm */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <Title level={3} style={{ margin: 0, fontWeight: 800, letterSpacing: '-0.5px' }}>Tổng quan hệ thống</Title>
                 
@@ -91,7 +55,6 @@ const AdminDashboard: React.FC = () => {
                 </Space>
             </div>
             
-            {/* CARDS THỐNG KÊ */}
             <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
                 <Col xs={24} sm={12} lg={6}>
                     <Card className="premium-card hover-lift" bordered={false} style={{ borderRadius: 16 }}>
@@ -137,7 +100,6 @@ const AdminDashboard: React.FC = () => {
                 </Col>
             </Row>
 
-            {/* BIỂU ĐỒ */}
             <Card className="premium-card" bordered={false} title={<span style={{ fontWeight: 700 }}>{`Biểu đồ doanh thu năm ${selectedYear}`}</span>} style={{ borderRadius: 16, marginBottom: 32 }}>
                 <div style={{ width: '100%', height: 400, marginTop: 16 }}>
                     <ResponsiveContainer>

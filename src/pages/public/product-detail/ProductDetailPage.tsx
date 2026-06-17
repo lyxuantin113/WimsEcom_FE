@@ -1,69 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-// Thêm Card vào import
-import { Row, Col, Image, Typography, Button, InputNumber, Divider, Space, message, Spin, Tag, Card } from 'antd';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { Row, Col, Image, Typography, Button, InputNumber, Divider, Space, Spin, Tag, Card } from 'antd';
 import { ShoppingCartOutlined, ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import productApi from '../../api/productApi';
-import type { ProductResponse } from '../../types/backend';
-import ProductCard from '../../components/product/ProductCard';
-import { useAddToCart } from '../../hooks/useAddToCart';
+import ProductCard from '../../../components/product/ProductCard';
+import { useProductDetail } from '../hooks/useProductDetail';
 
 const { Title, Text, Paragraph } = Typography;
 
 const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    const { isAdding, addToCart } = useAddToCart();
-
-    const [product, setProduct] = useState<ProductResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [quantity, setQuantity] = useState(1);
-
-    // State cho sản phẩm liên quan
-    const [relatedProducts, setRelatedProducts] = useState<ProductResponse[]>([]);
-
-    useEffect(() => {
-        const fetchProductData = async () => {
-            if (!id) return;
-            try {
-                setLoading(true);
-                // 1. Lấy chi tiết sản phẩm
-                const res = await productApi.getById(Number(id));
-                if (res && res.code === 1000 && res.result) {
-                    setProduct(res.result);
-
-                    // 2. Sau khi lấy xong sản phẩm chính -> Lấy sản phẩm liên quan luôn
-                    // (Gọi lồng nhau hoặc Promise.all đều được, ở đây gọi sau để chắc chắn ID tồn tại)
-                    fetchRelated(Number(id));
-                } else {
-                    message.error('Không tìm thấy sản phẩm!');
-                    navigate('/');
-                }
-            } catch (error) {
-                message.error('Lỗi kết nối!');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProductData();
-        // Reset lại số lượng khi đổi sản phẩm
-        setQuantity(1);
-        // Scroll lên đầu trang khi chuyển trang
-        window.scrollTo(0, 0);
-    }, [id, navigate]);
-
-    // Hàm lấy related tách riêng cho gọn
-    const fetchRelated = async (productId: number) => {
-        try {
-            const res = await productApi.getRelated(productId);
-            if (res && res.code === 1000 && res.result) {
-                setRelatedProducts(res.result);
-            }
-        } catch (e) {
-            console.error("Lỗi lấy related products", e);
-        }
-    }
+    const {
+        product,
+        loading,
+        quantity,
+        setQuantity,
+        relatedProducts,
+        isAdding,
+        addToCart,
+        navigate
+    } = useProductDetail(id);
 
     if (loading) return <div style={{ textAlign: 'center', padding: '100px' }}><Spin size="large" /></div>;
     if (!product) return null;
@@ -76,7 +31,6 @@ const ProductDetailPage: React.FC = () => {
                 Quay lại
             </Button>
 
-            {/* --- PHẦN CHI TIẾT SẢN PHẨM --- */}
             <Card className="premium-card" style={{ marginBottom: 60, borderRadius: 16, overflow: 'hidden' }} styles={{ body: { padding: '32px' } }}>
                 <Row gutter={[50, 40]}>
                     <Col xs={24} md={11}>
@@ -136,7 +90,6 @@ const ProductDetailPage: React.FC = () => {
                 </Row>
             </Card>
 
-            {/* --- PHẦN SẢN PHẨM LIÊN QUAN --- */}
             {relatedProducts.length > 0 && (
                 <div style={{ marginTop: 80 }}>
                     <div style={{ textAlign: 'center', marginBottom: 40 }} className="animate-fade-up">
